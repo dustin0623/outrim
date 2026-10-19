@@ -13,6 +13,7 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [progress, setProgress] = useState({ value: 5, stage: "Initializing core simulation" });
   const selectRef = useRef(onSelect);
   selectRef.current = onSelect;
   const selectedRef = useRef(selected);
@@ -26,11 +27,13 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
     const unsubscribe = bridge.onEvent((event) => {
       if (event.type === "selected") selectRef.current(event.hex);
       if (event.type === "camera") setZoom(event.zoom);
+      if (event.type === "progress") setProgress({ value: event.value, stage: event.stage });
       if (event.type === "ready") { setReady(true); bridge.command({ type: "select", hex: selectedRef.current }); }
     });
     // Phaser and its Scene are imported together only after the browser mounts.
     void Promise.all([import("phaser"), import("@/game/scenes/SpaceWorldScene")]).then(([Phaser, { SpaceWorldScene }]) => {
       if (cancelled) return;
+      setProgress({ value: 35, stage: "Loading engine" });
       const game = new Phaser.Game({
         type: Phaser.AUTO,
         parent,
@@ -66,7 +69,23 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
           if (event.key === "-") bridge.command({ type: "zoom", factor: 1 / 1.2 });
         }}
       />
-      {!ready && <div role="status" className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-primary">{error ? "Space map could not load. Please refresh." : "Connecting to sector…"}</div>}
+      {!ready && (
+        <div role="status" className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          {error ? (
+            <span className="text-sm text-primary">Space map could not load. Please refresh.</span>
+          ) : (
+            <div className="w-72 border border-border bg-card/90 p-4">
+              <div className="mb-1 flex items-baseline justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
+                <span>{progress.stage}</span>
+                <span className="font-mono text-primary">{progress.value}%</span>
+              </div>
+              <div className="h-2 w-full overflow-hidden bg-primary/20">
+                <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progress.value}%` }} />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
       <div className="absolute bottom-5 right-5 flex flex-col items-center gap-1 border border-border bg-card p-1">
         <Button variant="ghost" size="icon" title="Zoom in" aria-label="Zoom in" onClick={() => bridge.command({ type: "zoom", factor: 1.2 })}><Plus /></Button>
         <span className="w-10 text-center font-mono text-[10px] text-muted-foreground">{Math.round(zoom * 100)}%</span>

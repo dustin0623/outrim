@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { config } from "@/lib/config/config";
 import {
@@ -24,6 +24,10 @@ export function LoginPanel() {
   const [hiveUser, setHiveUser] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // The page renders on the server first; until React takes over, a native
+  // form submit would just reload the page and bounce the user back to login.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const [prompt, setPrompt] = useState<XrplQrPrompt | null>(null);
 
   const run = async (fn: () => Promise<Parameters<typeof setPlayer>[0]>) => {
@@ -71,7 +75,7 @@ export function LoginPanel() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
-          <Button type="submit" className="w-full" disabled={busy}>
+          <Button type="submit" className="w-full" disabled={busy || !hydrated}>
             {mode === "login" ? "Log in" : "Create account"}
           </Button>
           <button
