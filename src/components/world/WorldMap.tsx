@@ -39,7 +39,7 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
         scale: { mode: Phaser.Scale.RESIZE, width: parent.clientWidth, height: parent.clientHeight },
         scene: [new SpaceWorldScene(bridge)],
         input: { activePointers: 2, mouse: { preventDefaultWheel: true } },
-        render: { roundPixels: false },
+        render: { roundPixels: false, antialiasGL: true },
       });
       destroy = () => game.destroy(true);
     }).catch((reason: unknown) => { if (!cancelled) { console.error("Space world failed to load", reason); setError(true); } });
