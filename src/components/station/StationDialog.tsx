@@ -9,15 +9,15 @@ import { RESOURCE_KEYS, RESOURCE_LABEL } from "@/lib/game/station/economy";
 
 const ICONS: Record<BuildingId, typeof Box> = { tribute: Coins, titanium: Pickaxe, plasma: Flame, rations: Sprout, vault: Box, attack: Swords, defense: Shield };
 
-export function StationDialog() {
+export function StationDialog({ trigger }: { trigger?: React.ReactNode }) {
   const { levels, upgrade } = useStationStore();
   const balance = useOwnedItems();
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="mt-2 w-full text-xs"><Radar className="size-4" /> Manage station</Button>
+        {trigger ?? <Button className="mt-2 w-full text-xs"><Radar className="size-4" /> Manage station</Button>}
       </DialogTrigger>
-      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto border-border bg-card">
+      <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-3xl overflow-y-auto border-primary/30 bg-card/95 backdrop-blur">
         <DialogHeader>
           <DialogTitle className="uppercase">Station management</DialogTitle>
           <DialogDescription>

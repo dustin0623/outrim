@@ -13,7 +13,7 @@ import { CRATE_COST_RIM, RARITIES, RARITY_META } from "@/lib/game/equipment/flee
 import { EquipmentCard, equipmentName } from "./EquipmentCard";
 import { DEFAULT_FILTERS, EquipmentFilters, filterEquipment } from "./EquipmentFilters";
 const ICONS: Record<ItemId, typeof Box> = { rim: Coins, nanites: Sparkles, titanium: Pickaxe, plasma: Flame, rations: Sprout, "equipment-crate": Package, "sabotage-device": Bomb, "help-kit": ShieldPlus };
-export function InventoryDialog() {
+export function InventoryDialog({ trigger }: { trigger?: React.ReactNode }) {
   const quantities = useOwnedItems();
   const player = useAuthStore((s) => s.player);
   const { items, buyCrates, openCrate } = useEquipmentStore();
@@ -22,8 +22,8 @@ export function InventoryDialog() {
   const owned = items.filter((i) => i.ownerId === player?.id);
   const gear = filterEquipment(owned, filters);
   const count = Number(quantity);
-  return <Dialog><DialogTrigger asChild><Button variant="ghost" size="sm"><Package className="size-4" /><span className="hidden sm:inline">Inventory</span><span className="sr-only sm:hidden">Inventory</span></Button></DialogTrigger>
-    <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-5xl overflow-y-auto bg-card">
+  return <Dialog><DialogTrigger asChild>{trigger ?? <Button variant="ghost" size="sm"><Package className="size-4" /><span>Inventory</span></Button>}</DialogTrigger>
+    <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-5xl overflow-y-auto border-primary/30 bg-card/95 backdrop-blur">
       <DialogHeader><DialogTitle>Inventory</DialogTitle><DialogDescription>{quantities.rim.toLocaleString()} RIM · {quantities.nanites.toLocaleString()} Nanites · {owned.length} equipment</DialogDescription></DialogHeader>
       <Tabs defaultValue="items"><TabsList><TabsTrigger value="items">Items</TabsTrigger><TabsTrigger value="gear">Equipment ({owned.length})</TabsTrigger></TabsList>
         <TabsContent value="items" className="space-y-5">
