@@ -11,7 +11,8 @@ describe("fleet equipment (reference formulas)", () => {
     expect(rollRarity(fixed(0.69))).toBe("common");
     expect(rollRarity(fixed(0.7))).toBe("uncommon");
     expect(rollRarity(fixed(0.979))).toBe("rare");
-    expect(rollRarity(fixed(0.9979))).toBe("legendary");
+    expect(rollRarity(fixed(0.9979))).toBe("epic");
+    expect(rollRarity(fixed(0.9981))).toBe("legendary");
   });
 
   it("stat count equals rarity index and includes the slot's primary", () => {
