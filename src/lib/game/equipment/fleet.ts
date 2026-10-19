@@ -22,17 +22,25 @@ export const STAT_LABEL: Record<StatKey, string> = {
   extraction: "Extraction", attack: "Attack", defense: "Defense", luck: "Luck", evasion: "Evasion", crit: "Crit",
 };
 
-/** Number of stats rolled and the value multiplier per rarity. */
-export const RARITY_META: Record<Rarity, { label: string; stats: number; mult: number; weight: number }> = {
-  common: { label: "Common", stats: 1, mult: 1, weight: 60 },
-  uncommon: { label: "Uncommon", stats: 2, mult: 1.5, weight: 25 },
-  rare: { label: "Rare", stats: 3, mult: 2.25, weight: 10 },
-  epic: { label: "Epic", stats: 4, mult: 3.5, weight: 4 },
-  legendary: { label: "Legendary", stats: 5, mult: 5, weight: 1 },
+/** Crate odds (percent) and rarity index, ported from the reference Salvage Cache. */
+export const RARITY_META: Record<Rarity, { label: string; odds: number; index: number }> = {
+  common: { label: "Common", odds: 70, index: 1 },
+  uncommon: { label: "Uncommon", odds: 20, index: 2 },
+  rare: { label: "Rare", odds: 8, index: 3 },
+  epic: { label: "Epic", odds: 1.8, index: 4 },
+  legendary: { label: "Legendary", odds: 0.2, index: 6 },
 };
 
 export const MAX_ITEM_LEVEL = 10;
 export const CRATE_COST_ALLOY = 250;
+/** Combat stats are stored on a x10 scale, like damage/defense in the reference. */
+export const SCALED_STATS: StatKey[] = ["attack", "defense"];
+/** Reference dismantle weights: combat/2, luck x10, others x5. */
+export const SALVAGE_WEIGHTS: Record<StatKey, number> = {
+  attack: 0.5, defense: 0.5, extraction: 5, evasion: 5, crit: 5, luck: 10,
+};
+export const UPGRADE_RATE = 0.0498;
+export const UPGRADE_MULTIPLIER = 1.05;
 
 export interface Equipment {
   id: string;
@@ -44,53 +52,67 @@ export interface Equipment {
 
 export type Rng = () => number;
 
+/** Cumulative 100,000-unit ladder walk, like the reference chest. */
 export function rollRarity(rng: Rng): Rarity {
-  const total = RARITIES.reduce((n, r) => n + RARITY_META[r].weight, 0);
-  let pick = rng() * total;
+  const roll = rng() * 100_000;
+  let max = 0;
   for (const r of RARITIES) {
-    pick -= RARITY_META[r].weight;
-    if (pick < 0) return r;
+    max += RARITY_META[r].odds * 1_000;
+    if (roll < max) return r;
   }
-  return "common";
+  return "legendary";
 }
 
-/** Primary stat is always rolled; extra stats are drawn from the rest. Values 5–10 × rarity mult. */
+/** Epic rolls one 50/50 between index 4 and 5; it drives both stat count and strength. */
+export function rollRarityIndex(rarity: Rarity, rng: Rng): number {
+  if (rarity === "epic") return rng() < 0.5 ? 4 : 5;
+  return RARITY_META[rarity].index;
+}
+
+/** Signature stat first, extra stats drawn from the rest; each value in [0.1·index, index]. */
 export function rollItem(rng: Rng, id: string, slot?: SlotKey, rarity?: Rarity): Equipment {
-  const s = slot ?? SLOTS[Math.floor(rng() * SLOTS.length)];
   const r = rarity ?? rollRarity(rng);
+  const s = slot ?? SLOTS[Math.floor(rng() * SLOTS.length)];
+  const index = rollRarityIndex(r, rng);
+  const count = Math.min(STATS.length, index);
   const primary = SLOT_META[s].primary;
   const pool = STATS.filter((k) => k !== primary);
   const keys: StatKey[] = [primary];
-  while (keys.length < RARITY_META[r].stats) keys.push(pool.splice(Math.floor(rng() * pool.length), 1)[0]);
+  while (keys.length < count && pool.length) keys.push(pool.splice(Math.floor(rng() * pool.length), 1)[0]);
+  const floor = 0.1 * index;
   const stats: StatRoll = {};
-  for (const k of keys) stats[k] = Math.round((5 + rng() * 5) * RARITY_META[r].mult);
+  for (const k of keys) {
+    const roll = rng() * (index - floor) + floor;
+    stats[k] = Math.round((SCALED_STATS.includes(k) ? roll * 10 : roll) * 10) / 10;
+  }
   return { id, slot: s, rarity: r, stats, level: 1 };
 }
 
-/** Each level above 1 adds 10% to every stat. */
+/** Stored stats already include upgrades (x1.05 compounding per level). */
 export function effectiveStats(item: Equipment): StatRoll {
-  const f = 1 + 0.1 * (item.level - 1);
+  return item.stats;
+}
+
+export function upgradedStats(stats: StatRoll): StatRoll {
   const out: StatRoll = {};
-  for (const k of STATS) if (item.stats[k]) out[k] = Math.round(item.stats[k]! * f);
+  for (const k of STATS) if (stats[k] !== undefined) out[k] = Math.round(stats[k]! * UPGRADE_MULTIPLIER * 10000) / 10000;
   return out;
 }
 
-export function statSum(item: Equipment): number {
-  return Object.values(effectiveStats(item)).reduce((a, b) => a + (b ?? 0), 0);
-}
+const round2 = (n: number) => Math.round(n * 100) / 100;
 
-/** Sparks returned when dismantling. */
+/** Sparks returned when dismantling (reference dismantleValue). */
 export function salvageValue(item: Equipment): number {
-  return statSum(item);
+  return round2(STATS.reduce((t, k) => t + (item.stats[k] ?? 0) * SALVAGE_WEIGHTS[k], 0));
 }
 
-/** Sparks cost to go from current level to the next. */
+/** Sparks cost to forge the next level: value × 0.0498 × level. */
 export function upgradeCostSparks(item: Equipment): number {
-  return Math.round(statSum(item) * 0.5 * item.level);
+  return round2(salvageValue(item) * UPGRADE_RATE * item.level);
 }
 
 export function fleetTotals(items: Equipment[]): Record<StatKey, number> {
   const t = Object.fromEntries(STATS.map((k) => [k, 0])) as Record<StatKey, number>;
-  for (const it of items) for (const [k, v] of Object.entries(effectiveStats(it))) t[k as StatKey] += v ?? 0;
+  for (const it of items) for (const [k, v] of Object.entries(it.stats)) t[k as StatKey] = round2(t[k as StatKey] + (v ?? 0));
   return t;
 }

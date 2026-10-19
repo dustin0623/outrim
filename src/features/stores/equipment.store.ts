@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { CRATE_COST_ALLOY, MAX_ITEM_LEVEL, rollItem, salvageValue, upgradeCostSparks, type Equipment, type SlotKey } from "@/lib/game/equipment/fleet";
+import { CRATE_COST_ALLOY, MAX_ITEM_LEVEL, rollItem, salvageValue, upgradeCostSparks, upgradedStats, type Equipment, type SlotKey } from "@/lib/game/equipment/fleet";
 import { useStationStore } from "@/features/stores/station.store";
 
 type EquipmentState = {
@@ -45,8 +45,8 @@ export const useEquipmentStore = create<EquipmentState>((set, get) => ({
     const cost = upgradeCostSparks(item);
     const { sparks } = useStationStore.getState();
     if (sparks < cost) return false;
-    useStationStore.setState({ sparks: sparks - cost });
-    set((s) => ({ items: s.items.map((i) => (i.id === id ? { ...i, level: i.level + 1 } : i)) }));
+    useStationStore.setState({ sparks: Math.round((sparks - cost) * 100) / 100 });
+    set((s) => ({ items: s.items.map((i) => (i.id === id ? { ...i, level: i.level + 1, stats: upgradedStats(i.stats) } : i)) }));
     return true;
   },
 }));
