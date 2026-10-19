@@ -22,6 +22,9 @@ export class SpaceWorldScene extends Phaser.Scene {
     this.load.image("station", stationUrl);
     this.load.image("ocean", oceanUrl);
     this.load.image("mineral", mineralUrl);
+    this.load.on("progress", (value: number) => {
+      this.bridge.emit({ type: "progress", value: 35 + Math.round(value * 55), stage: "Streaming sector textures" });
+    });
   }
 
   create() {
@@ -77,6 +80,7 @@ export class SpaceWorldScene extends Phaser.Scene {
     const resize = () => { this.dirty = true; };
     this.scale.on("resize", resize);
     this.events.once("shutdown", () => { unsubscribe(); this.scale.off("resize", resize); this.objects.clear(); });
+    this.bridge.emit({ type: "progress", value: 100, stage: "Calibrating sector grid" });
     this.bridge.emit({ type: "ready" });
     this.bridge.emit({ type: "camera", zoom: this.cameras.main.zoom });
   }
