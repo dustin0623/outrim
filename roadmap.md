@@ -22,6 +22,12 @@
 - [x] Xaman (QR + deep link), Joey (WalletConnect), GemWallet
 - [ ] Add XAMAN_API_KEY / XAMAN_API_SECRET secrets and VITE_REOWN_PROJECT_ID (blocked: needs your developer accounts)
 
+## TerraCore-inspired systems
+- [x] Study TerraCore mechanics → docs/TERRACORE_GAME_CONTEXT.md
+- [ ] 5-slot equipment system (operator, attacker ships, shield, mining ships, special)
+- [ ] Boss encounters on map worlds (HP, attack, salvage drops, combat log)
+- [ ] Ship roster required to travel to boss worlds
+
 ## Space world update
 - [x] Generated starfield, isometric station and gathering-planet artwork
 - [x] Phaser 3 world with large borderless isometric hex sectors, camera and selection bridge
