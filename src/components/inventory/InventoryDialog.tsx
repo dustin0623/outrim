@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Coins, Flame, Package, Pickaxe, Sparkles, Sprout } from "lucide-react";
+import { Bomb, Box, Coins, Flame, Package, Pickaxe, ShieldPlus, Sparkles, Sprout } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
