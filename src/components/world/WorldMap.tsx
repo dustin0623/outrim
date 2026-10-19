@@ -13,6 +13,7 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [progress, setProgress] = useState({ value: 5, stage: "Initializing core simulation" });
   const selectRef = useRef(onSelect);
   selectRef.current = onSelect;
   const selectedRef = useRef(selected);
@@ -26,11 +27,13 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
     const unsubscribe = bridge.onEvent((event) => {
       if (event.type === "selected") selectRef.current(event.hex);
       if (event.type === "camera") setZoom(event.zoom);
+      if (event.type === "progress") setProgress({ value: event.value, stage: event.stage });
       if (event.type === "ready") { setReady(true); bridge.command({ type: "select", hex: selectedRef.current }); }
     });
     // Phaser and its Scene are imported together only after the browser mounts.
     void Promise.all([import("phaser"), import("@/game/scenes/SpaceWorldScene")]).then(([Phaser, { SpaceWorldScene }]) => {
       if (cancelled) return;
+      setProgress({ value: 35, stage: "Loading engine" });
       const game = new Phaser.Game({
         type: Phaser.AUTO,
         parent,
