@@ -5,8 +5,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useEquipmentStore } from "@/features/stores/equipment.store";
 import { useStationStore } from "@/features/stores/station.store";
 import {
-  CRATE_COST_ALLOY, MAX_ITEM_LEVEL, RARITY_META, SLOTS, SLOT_META, STATS, STAT_LABEL,
-  effectiveStats, fleetTotals, salvageValue, upgradeCostSparks, type Equipment, type Rarity, type SlotKey,
+  CRATE_COST_RIM, MAX_ITEM_LEVEL, RARITY_META, SLOTS, SLOT_META, STATS, STAT_LABEL,
+  effectiveStats, fleetTotals, salvageValue, upgradeCostNanites, type Equipment, type Rarity, type SlotKey,
 } from "@/lib/game/equipment/fleet";
 import { cn } from "@/lib/utils";
 
@@ -35,8 +35,8 @@ function StatList({ item }: { item: Equipment }) {
 
 export function FleetDialog() {
   const { items, equipped, openCrate, equip, unequip, salvage, upgrade } = useEquipmentStore();
-  const alloy = useStationStore((s) => s.securedAlloy);
-  const sparks = useStationStore((s) => s.sparks);
+  const rim = useStationStore((s) => s.balance.rim);
+  const nanites = useStationStore((s) => s.nanites);
   const equippedItems = SLOTS.map((s) => items.find((i) => i.id === equipped[s])).filter(Boolean) as Equipment[];
   const totals = fleetTotals(equippedItems);
   const hold = items.filter((i) => equipped[i.slot] !== i.id);
@@ -49,7 +49,7 @@ export function FleetDialog() {
       <DialogContent className="max-h-[90dvh] max-w-4xl overflow-y-auto border-border bg-card">
         <DialogHeader>
           <DialogTitle className="uppercase">Fleet command</DialogTitle>
-          <DialogDescription>{alloy.toLocaleString()} Alloy · {sparks.toLocaleString()} Sparks</DialogDescription>
+          <DialogDescription>{rim.toLocaleString()} RIM · {nanites.toLocaleString()} Nanites (only used to upgrade equipment)</DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-3 gap-2 border border-border bg-background/60 p-3 text-xs sm:grid-cols-6">
@@ -78,23 +78,23 @@ export function FleetDialog() {
 
         <div className="flex items-center justify-between border-t border-border pt-3">
           <h3 className="text-sm font-semibold uppercase">Hangar ({hold.length})</h3>
-          <Button size="sm" disabled={alloy < CRATE_COST_ALLOY} onClick={() => {
+          <Button size="sm" disabled={rim < CRATE_COST_RIM} onClick={() => {
             const it = openCrate();
             if (it) toast.success(`Salvage crate: ${name(it)}`);
-          }}><Gem className="size-4" /> Open crate · {CRATE_COST_ALLOY} Alloy</Button>
+          }}><Gem className="size-4" /> Open crate · {CRATE_COST_RIM} RIM</Button>
         </div>
         {hold.length === 0 ? <p className="text-xs text-muted-foreground">No spare modules. Open a salvage crate to roll new equipment.</p> : (
           <div className="grid gap-2 sm:grid-cols-3">
             {hold.map((item) => {
-              const cost = upgradeCostSparks(item);
+              const cost = upgradeCostNanites(item);
               return (
                 <article key={item.id} className={cn("border bg-background/40 p-3", RARITY_CLASS[item.rarity])}>
                   <div className="text-sm font-semibold">{name(item)} <span className="font-mono text-[10px]">LV {item.level}</span></div>
                   <StatList item={item} />
                   <div className="mt-2 flex gap-1">
                     <Button size="sm" className="flex-1 text-xs" onClick={() => equip(item.id)}>Equip</Button>
-                    <Button size="sm" variant="outline" title={`Upgrade · ${cost} Sparks`} disabled={item.level >= MAX_ITEM_LEVEL || sparks < cost} onClick={() => upgrade(item.id) && toast.success(`Upgraded to LV ${item.level + 1}`)}><Hammer className="size-4" />{cost}</Button>
-                    <Button size="sm" variant="outline" title={`Dismantle for ${salvageValue(item)} Sparks`} onClick={() => toast.success(`+${salvage(item.id)} Sparks`)}><Flame className="size-4" /></Button>
+                    <Button size="sm" variant="outline" title={`Upgrade · ${cost} Nanites`} disabled={item.level >= MAX_ITEM_LEVEL || nanites < cost} onClick={() => upgrade(item.id) && toast.success(`Upgraded to LV ${item.level + 1}`)}><Hammer className="size-4" />{cost}</Button>
+                    <Button size="sm" variant="outline" title={`Dismantle for ${salvageValue(item)} Nanites`} onClick={() => toast.success(`+${salvage(item.id)} Nanites`)}><Flame className="size-4" /></Button>
                   </div>
                 </article>
               );

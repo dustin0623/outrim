@@ -14,7 +14,7 @@ export const SLOT_META: Record<SlotKey, { label: string; primary: StatKey; summa
   commander: { label: "Commander", primary: "crit", summary: "Fleet officer sharpening critical strikes" },
   attackers: { label: "Attack Wing", primary: "attack", summary: "Small strike ships launched from the Mothership" },
   shield: { label: "Shield Array", primary: "defense", summary: "Deflector grid protecting the fleet" },
-  mining: { label: "Mining Rig", primary: "extraction", summary: "Extraction drones boosting Alloy output" },
+  mining: { label: "Mining Rig", primary: "extraction", summary: "Extraction drones boosting station output" },
   ecm: { label: "ECM Suite", primary: "evasion", summary: "Electronic countermeasures to dodge incoming fire" },
 };
 
@@ -32,7 +32,7 @@ export const RARITY_META: Record<Rarity, { label: string; odds: number; index: n
 };
 
 export const MAX_ITEM_LEVEL = 10;
-export const CRATE_COST_ALLOY = 250;
+export const CRATE_COST_RIM = 5;
 /** Combat stats are stored on a x10 scale, like damage/defense in the reference. */
 export const SCALED_STATS: StatKey[] = ["attack", "defense"];
 /** Reference dismantle weights: combat/2, luck x10, others x5. */
@@ -101,13 +101,13 @@ export function upgradedStats(stats: StatRoll): StatRoll {
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-/** Sparks returned when dismantling (reference dismantleValue). */
+/** Nanites returned when dismantling (reference dismantleValue). */
 export function salvageValue(item: Equipment): number {
   return round2(STATS.reduce((t, k) => t + (item.stats[k] ?? 0) * SALVAGE_WEIGHTS[k], 0));
 }
 
-/** Sparks cost to forge the next level: value × 0.0498 × level. */
-export function upgradeCostSparks(item: Equipment): number {
+/** Nanites cost to forge the next level: value × 0.0498 × level. */
+export function upgradeCostNanites(item: Equipment): number {
   return round2(salvageValue(item) * UPGRADE_RATE * item.level);
 }
 
