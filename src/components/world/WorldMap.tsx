@@ -3,7 +3,7 @@ import { Crosshair, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GameBridge } from "@/game/bridge/GameBridge";
 import type { Hex } from "@/lib/game/world/hex";
-import starfield from "@/assets/world/starfield.jpg";
+const starfield = "/assets/world/starfield.jpg";
 
 type Props = { selected: Hex | null; onSelect: (h: Hex) => void; recenterKey: number };
 

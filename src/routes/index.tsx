@@ -12,10 +12,10 @@ import { StationDialog } from "@/components/station/StationDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
 import { storehouseCap } from "@/lib/game/station/economy";
 import { spaceObjectAt } from "@/lib/game/world/space";
-import starfield from "@/assets/world/starfield.jpg";
-import station from "@/assets/world/station.png";
-import ocean from "@/assets/world/ocean-planet.png";
-import mineral from "@/assets/world/mineral-planet.png";
+const starfield = "/assets/world/starfield.jpg";
+const station = "/assets/world/station.png";
+const ocean = "/assets/world/ocean-planet.png";
+const mineral = "/assets/world/mineral-planet.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
