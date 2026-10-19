@@ -11,6 +11,7 @@ import { useStationStore } from "@/features/stores/station.store";
 import { StationDialog } from "@/components/station/StationDialog";
 import { InventoryDialog } from "@/components/inventory/InventoryDialog";
 import { MarketplaceDialog } from "@/components/marketplace/MarketplaceDialog";
+import { ShopDialog } from "@/components/shop/ShopDialog";
 import { useOwnedItems } from "@/features/stores/items.store";
 import { FleetDialog } from "@/components/fleet/FleetDialog";
 import { ProfileDialog } from "@/components/profile/ProfileDialog";
@@ -91,6 +92,7 @@ function WorldScreen() {
         </div>
         <div className="pointer-events-auto flex items-center gap-3 border border-border bg-card px-3 py-2">
           <InventoryDialog />
+          <ShopDialog />
           <MarketplaceDialog />
           <ProfileDialog />
           <LoginDialog />
