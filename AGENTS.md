@@ -1446,3 +1446,4 @@ Preserve the architecture unless the user explicitly requests an architectural c
 - World artwork lives in public/assets/world and is referenced by literal /assets/world/... URLs, never bundled from src/assets (why: user requires assets out of src; template mandates public URLs for game assets).
 - Demo email login is created only when import.meta.env.DEV (why: no shared backdoor in production).
 - Station building rules are pure functions in src/lib/game/station; UI state lives in src/features/stores/station.store.ts (why: rules stay testable and move to the server unchanged).
+- Fleet equipment rules are pure functions in src/lib/game/equipment; UI state in src/features/stores/equipment.store.ts, which debits/credits the station store (why: one balance source, rules testable).

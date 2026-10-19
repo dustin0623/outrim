@@ -9,6 +9,7 @@ import { WorldMap } from "@/components/world/WorldMap";
 import { useAuthStore } from "@/features/stores/auth.store";
 import { useStationStore } from "@/features/stores/station.store";
 import { StationDialog } from "@/components/station/StationDialog";
+import { FleetDialog } from "@/components/fleet/FleetDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
 import { storehouseCap } from "@/lib/game/station/economy";
 import { spaceObjectAt } from "@/lib/game/world/space";
@@ -123,6 +124,7 @@ function WorldScreen() {
             </Button>
           </div>
           <StationDialog />
+          <FleetDialog />
         </div>
       </aside>
       <div className="pointer-events-none absolute bottom-6 right-24 hidden items-center gap-5 text-[10px] text-muted-foreground md:flex">
