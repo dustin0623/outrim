@@ -72,13 +72,13 @@ export function rollRarityIndex(rarity: Rarity, rng: Rng): number {
 /** Signature stat first, extra stats drawn from the rest; each value in [0.1·index, index]. */
 export function rollItem(rng: Rng, id: string, slot?: SlotKey, rarity?: Rarity): Equipment {
   const r = rarity ?? rollRarity(rng);
-  const s = slot ?? SLOTS[Math.floor(rng() * SLOTS.length)];
+  const s: SlotKey = slot ?? SLOTS[Math.floor(rng() * SLOTS.length)]!;
   const index = rollRarityIndex(r, rng);
   const count = Math.min(STATS.length, index);
   const primary = SLOT_META[s].primary;
   const pool = STATS.filter((k) => k !== primary);
   const keys: StatKey[] = [primary];
-  while (keys.length < count && pool.length) keys.push(pool.splice(Math.floor(rng() * pool.length), 1)[0]);
+  while (keys.length < count && pool.length) keys.push(pool.splice(Math.floor(rng() * pool.length), 1)[0]!);
   const floor = 0.1 * index;
   const stats: StatRoll = {};
   for (const k of keys) {
