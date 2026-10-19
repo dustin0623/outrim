@@ -95,6 +95,8 @@
   --sidebar-accent-foreground: oklch(0.94 0.02 230);
   --sidebar-border: oklch(0.36 0.05 245);
   --sidebar-ring: oklch(0.72 0.15 225);
+  --space-sector: oklch(0.28 0.05 220);
+  --space-sector-alt: oklch(0.34 0.035 225);
   /* World terrain */
   --terrain-plain: oklch(0.42 0.06 215);
   --terrain-rock: oklch(0.34 0.025 250);
@@ -161,3 +163,7 @@
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
+
+/* Space interface uses clean, compact typography over the world. */
+body { font-family: "Arial", system-ui, sans-serif; letter-spacing: 0; }
+[role="application"] canvas { display: block; }

@@ -21,3 +21,9 @@
 ## XRPL login
 - [x] Xaman (QR + deep link), Joey (WalletConnect), GemWallet
 - [ ] Add XAMAN_API_KEY / XAMAN_API_SECRET secrets and VITE_REOWN_PROJECT_ID (blocked: needs your developer accounts)
+
+## Space world update
+- [x] Generated starfield, isometric station and gathering-planet artwork
+- [x] Phaser 3 world with large borderless isometric hex sectors, camera and selection bridge
+- [x] Space-sector inspector and station/planet presentation
+- [ ] Verify sign-in, map selection, camera controls and narrow-screen layout
