@@ -32,7 +32,7 @@ export class SpaceWorldScene extends Phaser.Scene {
       if (!probe) return 0;
       probe.fillStyle = style.getPropertyValue(token).trim();
       probe.fillRect(0, 0, 1, 1);
-      const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
+      const [r = 0, g = 0, b = 0] = probe.getImageData(0, 0, 1, 1).data;
       return (r << 16) | (g << 8) | b;
     };
     this.palette = { sector: color("--space-sector"), alternate: color("--space-sector-alt"), primary: color("--primary"), foreground: color("--foreground"), rival: color("--base-rival"), muted: color("--muted-foreground") };
@@ -109,7 +109,7 @@ export class SpaceWorldScene extends Phaser.Scene {
     this.tiles?.fillStyle(color, alpha).fillPoints(points, true);
   }
 
-  update() {
+  override update() {
     if (!this.dirty || !this.tiles) return;
     this.dirty = false;
     const camera = this.cameras.main;
