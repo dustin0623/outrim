@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import * as Phaser from "phaser";
 import { GameBridge } from "@/game/bridge/GameBridge";
 import { HOME, WORLD_SIZE, inBounds, type Hex } from "@/lib/game/world/hex";
 import { ISO_Y, SECTOR_SIZE, pixelToSector, sectorToPixel, spaceObjectAt } from "@/lib/game/world/space";

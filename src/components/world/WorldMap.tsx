@@ -29,7 +29,7 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
       if (event.type === "ready") { setReady(true); bridge.command({ type: "select", hex: selectedRef.current }); }
     });
     // Phaser and its Scene are imported together only after the browser mounts.
-    void Promise.all([import("phaser"), import("@/game/scenes/SpaceWorldScene")]).then(([{ default: Phaser }, { SpaceWorldScene }]) => {
+    void Promise.all([import("phaser"), import("@/game/scenes/SpaceWorldScene")]).then(([Phaser, { SpaceWorldScene }]) => {
       if (cancelled) return;
       const game = new Phaser.Game({
         type: Phaser.AUTO,
