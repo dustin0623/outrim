@@ -62,7 +62,7 @@ describe("inventory and marketplace", () => {
     useEquipmentStore.getState().list(gear.id, 11, "Seller");
     signIn(buyer);
     expect(useEquipmentStore.getState().purchase(gear.id, 11)).toBe(false);
-    expect(useEquipmentStore.getState().items[0].ownerId).toBe(seller);
+    expect(useEquipmentStore.getState().items[0]?.ownerId).toBe(seller);
     expect(useItemsStore.getState().getQuantity("rim")).toBe(10);
   });
   it("keeps station spendable balances only in items", () => {
