@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Box, Crosshair, Globe2, Hexagon, Orbit, PackageCheck, Satellite, Sparkles } from "lucide-react";
+import { Box, ChevronDown, ChevronUp, Coins, Crosshair, Globe2, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, Satellite, ShoppingCart, Sparkles, Store } from "lucide-react";
 import { toast } from "sonner";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import { LoginDialog } from "@/components/auth/LoginDialog";
@@ -67,6 +67,8 @@ function WorldScreen() {
   const secureHaul = useStationStore((s) => s.secureHaul);
   const [selected, setSelected] = useState<Hex | null>(HOME);
   const [recenter, setRecenter] = useState(0);
+  const [reconOpen, setReconOpen] = useState(true);
+  useEffect(() => { if (window.innerWidth < 640) setReconOpen(false); }, []);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 5000);
@@ -78,71 +80,80 @@ function WorldScreen() {
   const object = selected ? spaceObjectAt(selected) : null;
   const art = object?.kind === "station" ? station : object?.variant === "ocean" ? ocean : mineral;
 
+  const chips = [
+    { k: "rim", label: "RIM", icon: Coins, value: balance.rim },
+    { k: "nanites", label: "Nanites", icon: Sparkles, value: nanites },
+    ...RESOURCE_KEYS.filter((k) => k !== "rim").map((k) => ({ k, label: RESOURCE_LABEL[k], icon: Box, value: balance[k] })),
+  ];
+  const dock = "pointer-events-auto flex min-w-14 flex-col items-center gap-1 border border-primary/20 bg-background/70 px-2 py-2 text-[10px] font-semibold uppercase text-muted-foreground transition hover:border-primary hover:text-primary sm:min-w-20";
+
   return (
     <main className="relative h-dvh w-full overflow-hidden bg-background text-foreground">
       <WorldMap selected={selected} onSelect={setSelected} recenterKey={recenter} />
-      <header className="pointer-events-none absolute inset-x-0 top-0 flex flex-wrap items-start justify-between gap-2 p-3 sm:p-5">
-        <div className="pointer-events-auto flex min-w-0 items-center flex-wrap gap-3 border border-border bg-card px-4 py-3 sm:gap-5">
-          <div className="flex items-center gap-2"><Orbit className="size-6 text-primary" /><h1 className="text-xl font-black uppercase">Outrim</h1></div>
-          <div className="hidden h-7 border-l border-border sm:block" />
-          {RESOURCE_KEYS.map((k) => (
-            <div key={k} className="flex items-center gap-2"><Box className="size-4 text-primary" /><div><div className="text-[9px] uppercase text-muted-foreground">{RESOURCE_LABEL[k]}</div><b className="text-sm">{balance[k].toLocaleString()}</b></div></div>
-          ))}
-          <div className="flex items-center gap-2"><Sparkles className="size-4 text-accent" /><div><div className="text-[9px] uppercase text-muted-foreground">Nanites</div><b className="text-sm">{nanites.toLocaleString()}</b></div></div>
-        </div>
-        <div className="pointer-events-auto flex items-center gap-3 border border-border bg-card px-3 py-2">
-          <InventoryDialog />
-          <ShopDialog />
-          <MarketplaceDialog />
+
+      {/* Top command bar */}
+      <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start gap-2 p-2 sm:p-4">
+        <div className="pointer-events-auto flex shrink-0 items-center gap-2 border border-primary/30 bg-card/90 px-2 py-1.5 backdrop-blur">
           <ProfileDialog />
-          <LoginDialog />
         </div>
+        <div className="pointer-events-auto flex min-w-0 flex-1 gap-1.5 overflow-x-auto border border-primary/20 bg-card/80 p-1.5 backdrop-blur [scrollbar-width:none]">
+          {chips.map(({ k, label, icon: Icon, value }) => (
+            <div key={k} title={label} className="flex shrink-0 items-center gap-1.5 bg-background/60 px-2 py-1">
+              <Icon className={`size-3.5 ${k === "nanites" ? "text-accent" : "text-primary"}`} />
+              <span className="hidden text-[9px] uppercase text-muted-foreground lg:inline">{label}</span>
+              <b className="font-mono text-xs">{value.toLocaleString()}</b>
+            </div>
+          ))}
+        </div>
+        <div className="pointer-events-auto shrink-0 border border-primary/20 bg-card/80 p-1 backdrop-blur"><LoginDialog /></div>
       </header>
-      <div className="pointer-events-none absolute left-5 top-28 hidden sm:block">
-        <div className="flex items-center gap-2 text-xs font-semibold text-foreground"><Hexagon className="size-4 text-primary" /> THE OUTER RIM</div>
+
+      <div className="pointer-events-none absolute left-4 top-20 hidden sm:block">
+        <div className="flex items-center gap-2 text-xs font-semibold"><Hexagon className="size-4 text-primary" /> THE OUTER RIM</div>
         <p className="mt-1 font-mono text-[10px] text-muted-foreground">WORLD 01 · 250 × 250 SECTORS</p>
       </div>
-      <aside aria-label="Sector details" className="absolute bottom-5 left-3 w-[min(19rem,calc(100vw-5.5rem))] border border-border bg-card sm:left-5">
-        <div className="flex items-center justify-between border-b border-border px-4 py-2.5 text-[10px] uppercase text-muted-foreground">
-          <span className="flex items-center gap-2"><Crosshair className="size-3 text-primary" /> Sector signal</span>
-          <span className="font-mono">{selected ? `${selected.q} : ${selected.r}` : "—"}</span>
-        </div>
-        <div className="p-4">
-          <div className="mb-4 flex items-center gap-3">
-            {object ? <img src={art} alt="" width={64} height={64} className="size-16 shrink-0 object-contain" loading="lazy" /> : <Orbit className="m-3 size-10 shrink-0 text-muted-foreground" />}
-            <div className="min-w-0"><p className="mb-1 text-[9px] uppercase text-primary">{object?.kind === "station" ? (object.variant === "own" ? "Home sector" : "Occupied sector") : object ? "Boss world" : "Unoccupied sector"}</p><h2 className="text-lg font-semibold">{object?.name ?? "Deep Space"}</h2></div>
+
+      {/* Sector recon */}
+      <aside aria-label="Sector details" className="absolute bottom-24 left-2 w-[min(18rem,calc(100vw-1rem))] border border-primary/30 bg-card/90 backdrop-blur sm:bottom-28 sm:left-4">
+        <button onClick={() => setReconOpen((o) => !o)} className="flex w-full items-center justify-between border-b border-border px-3 py-2 text-[10px] uppercase text-muted-foreground">
+          <span className="flex items-center gap-2"><Crosshair className="size-3 text-primary" /> {object?.name ?? "Deep Space"}</span>
+          <span className="flex items-center gap-2 font-mono">{selected ? `${selected.q}:${selected.r}` : "—"}{reconOpen ? <ChevronDown className="size-3" /> : <ChevronUp className="size-3" />}</span>
+        </button>
+        {reconOpen && <div className="space-y-3 p-3">
+          <div className="flex items-center gap-3">
+            {object ? <img src={art} alt="" width={56} height={56} className="size-14 shrink-0 object-contain" loading="lazy" /> : <Orbit className="m-2 size-10 shrink-0 text-muted-foreground" />}
+            <div className="min-w-0 text-xs">
+              <p className="text-[9px] uppercase text-primary">{object?.kind === "station" ? (object.variant === "own" ? "Home sector" : "Occupied sector") : object ? "Boss world" : "Unoccupied sector"}</p>
+              <p className="text-muted-foreground">{object?.kind === "station" ? "Orbital station" : object ? (object.variant === "ocean" ? "Ocean planet" : "Mineral planet") : "Open space"} · {selected ? hexDistance(HOME, selected) : 0} sectors away</p>
+              {object?.kind === "planet" && <p className="text-[10px] text-accent">Expeditions not yet available</p>}
+            </div>
           </div>
-          <dl className="space-y-2 text-xs">
-            <div className="flex justify-between gap-2"><dt className="text-muted-foreground">Classification</dt><dd>{object?.kind === "station" ? "Orbital station" : object ? (object.variant === "ocean" ? "Ocean planet" : "Mineral planet") : "Open space"}</dd></div>
-            <div className="flex justify-between gap-2"><dt className="text-muted-foreground">From your station</dt><dd>{selected ? hexDistance(HOME, selected) : 0} sectors</dd></div>
-            {object?.kind === "planet" && <div className="flex justify-between gap-2"><dt className="text-muted-foreground">Resource</dt><dd className="text-accent">{object.resource}</dd></div>}
-          </dl>
-          {object?.kind === "planet" && <p className="mt-3 border-t border-border pt-3 text-[10px] text-muted-foreground">Expeditions not yet available</p>}
-          <Button variant="secondary" className="mt-4 w-full text-xs" onClick={() => { setSelected(HOME); setRecenter((n) => n + 1); }}><Satellite className="size-4" /> Your station <Crosshair className="ml-auto size-3" /></Button>
-          <div className="mt-2 border border-border bg-background/60 p-3">
-            <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground"><PackageCheck className="size-4 text-primary" /> Unsecured output</div>
+          <div className="border border-border bg-background/60 p-2">
+            <div className="mb-1 flex items-center gap-2 text-[10px] uppercase text-muted-foreground"><PackageCheck className="size-3 text-primary" /> Uncollected output</div>
             {RESOURCE_KEYS.map((k) => (
               <div key={k} className="mt-1">
-                <div className="flex justify-between text-[10px]"><span className="text-muted-foreground">{RESOURCE_LABEL[k]}</span><span className="font-mono"><b className="text-foreground">{exposed[k].toLocaleString()}</b> / {cap[k].toLocaleString()}</span></div>
+                <div className="flex justify-between text-[10px]"><span className="text-muted-foreground">{RESOURCE_LABEL[k]}</span><span className="font-mono"><b>{exposed[k].toLocaleString()}</b> / {cap[k].toLocaleString()}</span></div>
                 <div className="h-1 w-full bg-primary/20"><div className="h-full bg-primary transition-all" style={{ width: `${Math.min(100, (exposed[k] / cap[k]) * 100)}%` }} /></div>
               </div>
             ))}
-            <Button
-              size="sm" className="mt-2 w-full text-xs" disabled={!hasAny(exposed)}
-              onClick={() => { const n = secureHaul(); if (n) toast.success(`Collected ${RESOURCE_KEYS.map((k) => `${n[k]} ${RESOURCE_LABEL[k]}`).join(", ")}`); }}
-            >
-              <PackageCheck className="size-4" /> Collect tribute & resources
+            <Button size="sm" className="mt-2 w-full text-xs" disabled={!hasAny(exposed)}
+              onClick={() => { const n = secureHaul(); if (n) toast.success(`Collected ${RESOURCE_KEYS.map((k) => `${n[k]} ${RESOURCE_LABEL[k]}`).join(", ")}`); }}>
+              <PackageCheck className="size-4" /> Collect all
             </Button>
           </div>
-          <StationDialog />
-          <FleetDialog />
-        </div>
+        </div>}
       </aside>
-      <div className="pointer-events-none absolute bottom-6 right-24 hidden items-center gap-5 text-[10px] text-muted-foreground md:flex">
-        <span className="flex items-center gap-2"><Satellite className="size-3 text-primary" /> Station</span>
-        <span className="flex items-center gap-2"><Globe2 className="size-3 text-accent" /> Boss world</span>
-        <span className="font-mono">ALPHA WORLD</span>
-      </div>
+
+      {/* Bottom command dock */}
+      <nav aria-label="Command dock" className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-2 sm:p-4">
+        <div className="pointer-events-auto flex gap-1 border border-primary/30 bg-card/90 p-1.5 backdrop-blur sm:gap-2">
+          <StationDialog trigger={<button className={dock}><Radar className="size-5" />Station</button>} />
+          <FleetDialog trigger={<button className={dock}><Rocket className="size-5" />Fleet</button>} />
+          <InventoryDialog trigger={<button className={dock}><Package className="size-5" />Items</button>} />
+          <ShopDialog trigger={<button className={dock}><ShoppingCart className="size-5" />Shop</button>} />
+          <MarketplaceDialog trigger={<button className={dock}><Store className="size-5" />Market</button>} />
+        </div>
+      </nav>
     </main>
   );
 }

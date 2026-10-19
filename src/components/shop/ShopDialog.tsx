@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { Bomb, Package, ShieldPlus, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
@@ -43,14 +44,14 @@ function StockCard({ id, icon: Icon }: { id: ShopItemId; icon: typeof Package })
   );
 }
 
-export function ShopDialog() {
+export function ShopDialog({ trigger }: { trigger?: ReactNode }) {
   const { rim } = useOwnedItems();
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="sm" variant="ghost"><ShoppingCart className="size-4" /><span className="hidden sm:inline">Shop</span><span className="sr-only sm:hidden">Shop</span></Button>
+        {trigger ?? <Button size="sm" variant="ghost"><ShoppingCart className="size-4" /><span>Shop</span></Button>}
       </DialogTrigger>
-      <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-4xl overflow-y-auto bg-card">
+      <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-4xl overflow-y-auto border-primary/30 bg-card/95 backdrop-blur">
         <DialogHeader>
           <DialogTitle>Supply Depot</DialogTitle>
           <DialogDescription>{rim.toLocaleString()} RIM · Up to {MAX_PURCHASE_QUANTITY} per purchase · Open crates from Inventory</DialogDescription>

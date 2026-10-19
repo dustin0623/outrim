@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Crown, Flame, Gem, Hammer, Pickaxe, Radio, Rocket, Shield, Ship, Swords } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ function StatList({ item }: { item: Equipment }) {
   );
 }
 
-export function FleetDialog() {
+export function FleetDialog({ trigger }: { trigger?: ReactNode }) {
   const { items: allItems, equipped, openCrate, buyCrates, equip, unequip, salvage, upgrade } = useEquipmentStore();
   const owner = useAuthStore((s) => s.player?.id);
   const items = allItems.filter((i) => i.ownerId === owner && !i.marketPrice);
@@ -46,9 +47,9 @@ export function FleetDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="mt-2 w-full text-xs"><Rocket className="size-4" /> Fleet & equipment</Button>
+        {trigger ?? <Button variant="secondary" className="mt-2 w-full text-xs"><Rocket className="size-4" /> Fleet & equipment</Button>}
       </DialogTrigger>
-      <DialogContent className="max-h-[90dvh] max-w-4xl overflow-y-auto border-border bg-card">
+      <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-4xl overflow-y-auto border-primary/30 bg-card/95 backdrop-blur">
         <DialogHeader>
           <DialogTitle className="uppercase">Fleet command</DialogTitle>
           <DialogDescription>{rim.toLocaleString()} RIM · {nanites.toLocaleString()} Nanites (only used to upgrade equipment)</DialogDescription>
