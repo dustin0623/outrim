@@ -1,21 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { STARTING_LEVELS } from "./buildings";
-import { exposedYield, storehouseCap } from "./economy";
+import { exposedYield, vaultCap } from "./economy";
 
 const HOUR = 3_600_000;
 
 describe("resource economy", () => {
-  it("Extractor 1 produces 60 Alloy per hour", () => {
-    expect(exposedYield(STARTING_LEVELS, 0, HOUR)).toBe(60);
+  it("Mining 1 produces 1 RIM, 40 Ti, 20 Plasma, 25 Food per hour", () => {
+    expect(exposedYield(STARTING_LEVELS, 0, HOUR)).toEqual({ rim: 1, titanium: 40, plasma: 20, food: 25 });
   });
-  it("produces nothing before an hour of elapsed fractions accumulate", () => {
-    expect(exposedYield(STARTING_LEVELS, 0, HOUR / 2)).toBe(30);
-  });
-  it("Extractor 0 produces nothing", () => {
-    expect(exposedYield({ ...STARTING_LEVELS, extractor: 0 }, 0, 100 * HOUR)).toBe(0);
-  });
-  it("Storehouse caps exposed Alloy at 1,000 × level", () => {
-    expect(storehouseCap(STARTING_LEVELS)).toBe(1000);
-    expect(exposedYield(STARTING_LEVELS, 0, 1000 * HOUR)).toBe(1000);
+  it("Vault 1 caps at 10 RIM and 1,000 per resource", () => {
+    expect(vaultCap(STARTING_LEVELS)).toEqual({ rim: 10, titanium: 1000, plasma: 1000, food: 1000 });
+    expect(exposedYield(STARTING_LEVELS, 0, 1000 * HOUR).rim).toBe(10);
   });
 });

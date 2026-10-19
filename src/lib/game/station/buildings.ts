@@ -1,43 +1,36 @@
-/** Pure station building rules (GDD §5), with instant upgrades instead of a construction queue. */
-export type BuildingId = "hq" | "extractor" | "storehouse" | "barracks" | "dispatch" | "defense";
+/** Pure station upgrade rules: four core stats (TerraCore / reference parity), instant upgrades on payment. */
+import { RESOURCE_KEYS, type Resources } from "./economy";
+
+export type BuildingId = "vault" | "mining" | "attack" | "defense";
 export type BuildingLevels = Record<BuildingId, number>;
 
-export const MAX_LEVEL = 10;
-
-export const BUILDINGS: { id: BuildingId; name: string; costFactor: number; summary: string }[] = [
-  { id: "hq", name: "Command Rig", costFactor: 120, summary: "Sets the highest level every other module can reach" },
-  { id: "extractor", name: "Extractor", costFactor: 80, summary: "Produces Alloy over time" },
-  { id: "storehouse", name: "Storehouse", costFactor: 60, summary: "Holds exposed Alloy before it is secured" },
-  { id: "barracks", name: "Barracks", costFactor: 100, summary: "Trains units faster at higher levels" },
-  { id: "dispatch", name: "Dispatch Bay", costFactor: 90, summary: "Allows more expeditions at once" },
-  { id: "defense", name: "Defense Array", costFactor: 110, summary: "Adds defense strength to your station" },
+/** Per-level resource weight for each module; RIM always costs max(1, level²). */
+export const BUILDINGS: { id: BuildingId; name: string; summary: string; weights: Omit<Resources, "rim"> }[] = [
+  { id: "vault", name: "Vault", summary: "Raises how much unsecured output the station can hold", weights: { titanium: 50, plasma: 10, food: 10 } },
+  { id: "mining", name: "Mining", summary: "Produces RIM, Titanium, Plasma and Food over time", weights: { titanium: 30, plasma: 30, food: 10 } },
+  { id: "attack", name: "Attack", summary: "Raises raid and boss damage", weights: { titanium: 20, plasma: 40, food: 20 } },
+  { id: "defense", name: "Defense", summary: "Protects your station from raids", weights: { titanium: 40, plasma: 10, food: 30 } },
 ];
 
-export const STARTING_LEVELS: BuildingLevels = { hq: 1, extractor: 1, storehouse: 1, barracks: 1, dispatch: 1, defense: 0 };
-export const STARTING_ALLOY = 500;
+export const STARTING_LEVELS: BuildingLevels = { vault: 1, mining: 1, attack: 1, defense: 1 };
+export const STARTING_BALANCE: Resources = { rim: 10, titanium: 500, plasma: 250, food: 250 };
 
-export function upgradeCost(id: BuildingId, targetLevel: number): number {
-  const def = BUILDINGS.find((b) => b.id === id)!;
-  return def.costFactor * targetLevel * targetLevel;
+/** Cost to go from `currentLevel` to the next level. */
+export function upgradeCost(id: BuildingId, currentLevel: number): Resources {
+  const w = BUILDINGS.find((b) => b.id === id)!.weights;
+  const sq = Math.max(1, currentLevel * currentLevel);
+  return { rim: sq, titanium: w.titanium * sq, plasma: w.plasma * sq, food: w.food * sq };
+}
+
+export function canAfford(balance: Resources, cost: Resources): boolean {
+  return RESOURCE_KEYS.every((k) => balance[k] >= cost[k]);
 }
 
 export function effectAt(id: BuildingId, level: number): string {
   switch (id) {
-    case "hq": return `Modules up to level ${level}`;
-    case "extractor": return `${60 * level} Alloy / hour`;
-    case "storehouse": return `${(1000 * level).toLocaleString()} Alloy capacity`;
-    case "barracks": return level === 0 ? "Training offline" : `-${Math.min(45, 5 * (level - 1))}% training time`;
-    case "dispatch": return `${Math.min(5, level)} expedition${Math.min(5, level) === 1 ? "" : "s"} at once`;
-    case "defense": return `+${20 * level} defense`;
+    case "vault": return `${10 * level} RIM · ${(1000 * level).toLocaleString()} each resource`;
+    case "mining": return `${level} RIM · ${40 * level} Ti · ${20 * level} Plasma · ${25 * level} Food / h`;
+    case "attack": return `+${10 * level} attack`;
+    case "defense": return `+${10 * level} defense`;
   }
-}
-
-export type UpgradeBlock = "max" | "hq" | "alloy" | null;
-
-export function upgradeBlock(id: BuildingId, levels: BuildingLevels, alloy: number): UpgradeBlock {
-  const target = levels[id] + 1;
-  if (target > MAX_LEVEL) return "max";
-  if (id !== "hq" && target > levels.hq) return "hq";
-  if (alloy < upgradeCost(id, target)) return "alloy";
-  return null;
 }

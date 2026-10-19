@@ -1,15 +1,15 @@
-import { Box, Building2, Factory, Radar, Rocket, Shield, Swords, Warehouse } from "lucide-react";
+import { Box, Pickaxe, Radar, Shield, Swords } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useStationStore } from "@/features/stores/station.store";
-import { BUILDINGS, MAX_LEVEL, effectAt, upgradeBlock, upgradeCost, type BuildingId } from "@/lib/game/station/buildings";
+import { BUILDINGS, canAfford, effectAt, upgradeCost, type BuildingId } from "@/lib/game/station/buildings";
+import { RESOURCE_KEYS, RESOURCE_LABEL } from "@/lib/game/station/economy";
 
-const ICONS: Record<BuildingId, typeof Box> = { hq: Building2, extractor: Factory, storehouse: Warehouse, barracks: Swords, dispatch: Rocket, defense: Shield };
-const BLOCK_TEXT = { max: "Max level", hq: "Upgrade Command Rig first", alloy: "Not enough Alloy" } as const;
+const ICONS: Record<BuildingId, typeof Box> = { vault: Box, mining: Pickaxe, attack: Swords, defense: Shield };
 
 export function StationDialog() {
-  const { levels, securedAlloy, upgrade } = useStationStore();
+  const { levels, balance, upgrade } = useStationStore();
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -18,34 +18,36 @@ export function StationDialog() {
       <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto border-border bg-card">
         <DialogHeader>
           <DialogTitle className="uppercase">Station management</DialogTitle>
-          <DialogDescription className="flex items-center gap-2">
-            <Box className="size-4 text-primary" /> <b className="text-foreground">{securedAlloy.toLocaleString()}</b> secured Alloy available · upgrades apply instantly
+          <DialogDescription>
+            {RESOURCE_KEYS.map((k) => `${balance[k].toLocaleString()} ${RESOURCE_LABEL[k]}`).join(" · ")} · upgrades apply instantly
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-3 sm:grid-cols-2">
           {BUILDINGS.map((b) => {
             const Icon = ICONS[b.id];
             const level = levels[b.id];
-            const block = upgradeBlock(b.id, levels, securedAlloy);
-            const cost = level < MAX_LEVEL ? upgradeCost(b.id, level + 1) : 0;
+            const cost = upgradeCost(b.id, level);
+            const ok = canAfford(balance, cost);
             return (
               <section key={b.id} className="flex flex-col border border-border bg-background/60 p-4">
                 <div className="mb-2 flex items-center gap-3">
                   <Icon className="size-6 text-primary" />
                   <div className="min-w-0 flex-1"><h3 className="font-semibold">{b.name}</h3><p className="text-[10px] text-muted-foreground">{b.summary}</p></div>
-                  <span className="font-mono text-xs text-primary">LV {level}/{MAX_LEVEL}</span>
+                  <span className="font-mono text-xs text-primary">LV {level}</span>
                 </div>
                 <dl className="mb-3 space-y-1 text-xs">
-                  <div className="flex justify-between"><dt className="text-muted-foreground">Now</dt><dd>{level === 0 ? "Not built" : effectAt(b.id, level)}</dd></div>
-                  {level < MAX_LEVEL && <div className="flex justify-between"><dt className="text-muted-foreground">Next</dt><dd className="text-accent">{effectAt(b.id, level + 1)}</dd></div>}
+                  <div className="flex justify-between gap-2"><dt className="text-muted-foreground">Now</dt><dd className="text-right">{effectAt(b.id, level)}</dd></div>
+                  <div className="flex justify-between gap-2"><dt className="text-muted-foreground">Next</dt><dd className="text-right text-accent">{effectAt(b.id, level + 1)}</dd></div>
                 </dl>
-                <Button
-                  size="sm" variant={block ? "secondary" : "default"} disabled={!!block} className="mt-auto text-xs"
-                  onClick={() => { if (upgrade(b.id)) toast.success(`${b.name} upgraded to level ${level + 1}`); }}
-                >
-                  {block ? BLOCK_TEXT[block] : <>{level === 0 ? "Build" : "Upgrade"} · <Box className="size-3" /> {cost.toLocaleString()}</>}
+                <ul className="mb-2 grid grid-cols-2 gap-x-3 text-[10px]">
+                  {RESOURCE_KEYS.map((k) => (
+                    <li key={k} className={`flex justify-between ${balance[k] < cost[k] ? "text-destructive" : "text-muted-foreground"}`}><span>{RESOURCE_LABEL[k]}</span><span className="font-mono">{cost[k].toLocaleString()}</span></li>
+                  ))}
+                </ul>
+                <Button size="sm" variant={ok ? "default" : "secondary"} disabled={!ok} className="mt-auto text-xs"
+                  onClick={() => { if (upgrade(b.id)) toast.success(`${b.name} upgraded to level ${level + 1}`); }}>
+                  {ok ? `Upgrade to LV ${level + 1}` : "Not enough resources"}
                 </Button>
-                {block === "alloy" && <p className="mt-1 text-center text-[10px] text-muted-foreground">Costs {cost.toLocaleString()} Alloy</p>}
               </section>
             );
           })}
