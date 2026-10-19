@@ -56,9 +56,19 @@ function WorldScreen() {
   const player = useAuthStore((s) => s.player);
   const alloy = useStationStore((s) => s.securedAlloy);
   const sparks = useStationStore((s) => s.sparks);
+  const levels = useStationStore((s) => s.levels);
+  const exposedOf = useStationStore((s) => s.exposed);
+  const secureHaul = useStationStore((s) => s.secureHaul);
   const [selected, setSelected] = useState<Hex | null>(HOME);
   const [recenter, setRecenter] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 5000);
+    return () => clearInterval(t);
+  }, []);
   if (!player) return null;
+  const exposed = exposedOf();
+  const cap = storehouseCap(levels);
   const object = selected ? spaceObjectAt(selected) : null;
   const art = object?.kind === "station" ? station : object?.variant === "ocean" ? ocean : mineral;
 
