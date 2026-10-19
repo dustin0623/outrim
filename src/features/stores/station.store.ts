@@ -3,7 +3,7 @@ import { STARTING_BALANCE, STARTING_LEVELS, canAfford, upgradeCost, type Buildin
 import { addResources, exposedYield, hasAny, subResources, type Resources } from "@/lib/game/station/economy";
 
 type StationState = {
-  /** Secured RIM token + Titanium, Plasma, Food. */
+  /** Secured RIM token + Titanium, Plasma, Rations. */
   balance: Resources;
   /** Salvage currency; only spent on equipment upgrades. */
   nanites: number;
