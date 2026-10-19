@@ -121,9 +121,9 @@ function WorldScreen() {
             ))}
             <Button
               size="sm" className="mt-2 w-full text-xs" disabled={!hasAny(exposed)}
-              onClick={() => { const n = secureHaul(); if (n) toast.success(`Secured ${RESOURCE_KEYS.map((k) => `${n[k]} ${RESOURCE_LABEL[k]}`).join(", ")}`); }}
+              onClick={() => { const n = secureHaul(); if (n) toast.success(`Collected ${RESOURCE_KEYS.map((k) => `${n[k]} ${RESOURCE_LABEL[k]}`).join(", ")}`); }}
             >
-              <PackageCheck className="size-4" /> Secure haul
+              <PackageCheck className="size-4" /> Collect tribute & resources
             </Button>
           </div>
           <StationDialog />
