@@ -26,4 +26,4 @@
 - [x] Generated starfield, isometric station and gathering-planet artwork
 - [x] Phaser 3 world with large borderless isometric hex sectors, camera and selection bridge
 - [x] Space-sector inspector and station/planet presentation
-- [ ] Verify sign-in, map selection, camera controls and narrow-screen layout
+- [x] Verify sign-in, map selection, camera controls and narrow-screen layout
