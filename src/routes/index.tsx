@@ -68,6 +68,7 @@ function WorldScreen() {
   const [selected, setSelected] = useState<Hex | null>(HOME);
   const [recenter, setRecenter] = useState(0);
   const [reconOpen, setReconOpen] = useState(true);
+  useEffect(() => { if (window.innerWidth < 640) setReconOpen(false); }, []);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 5000);
@@ -142,15 +143,6 @@ function WorldScreen() {
           </div>
         </div>}
       </aside>
-
-      {/* Map controls */}
-      <div className="absolute bottom-24 right-2 flex flex-col items-end gap-2 sm:bottom-28 sm:right-4">
-        <Button size="icon" aria-label="Recenter on your station" className="size-12 rounded-full shadow-lg" onClick={() => { setSelected(HOME); setRecenter((n) => n + 1); }}><Satellite className="size-5" /></Button>
-        <div className="pointer-events-none hidden items-center gap-3 border border-border bg-card/80 px-2 py-1 text-[10px] text-muted-foreground md:flex">
-          <span className="flex items-center gap-1"><Satellite className="size-3 text-primary" /> Station</span>
-          <span className="flex items-center gap-1"><Globe2 className="size-3 text-accent" /> Boss world</span>
-        </div>
-      </div>
 
       {/* Bottom command dock */}
       <nav aria-label="Command dock" className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-2 sm:p-4">
