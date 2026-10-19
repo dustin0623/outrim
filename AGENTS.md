@@ -1447,3 +1447,4 @@ Preserve the architecture unless the user explicitly requests an architectural c
 - Demo email login is created only when import.meta.env.DEV (why: no shared backdoor in production).
 - Station building rules are pure functions in src/lib/game/station; UI state lives in src/features/stores/station.store.ts (why: rules stay testable and move to the server unchanged).
 - Fleet equipment rules are pure functions in src/lib/game/equipment; UI state in src/features/stores/equipment.store.ts, which debits/credits the station store (why: one balance source, rules testable).
+- Operator profile: leveling formula and cosmetic catalog are pure modules in src/lib/game/profile (reference formulas), UI state in src/features/stores/player.store.ts, cosmetics served from public/assets/{avatars,banners,backgrounds} by literal URLs (why: level math testable, one XP source credited by station/equipment stores).

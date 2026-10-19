@@ -10,6 +10,7 @@ import { useAuthStore } from "@/features/stores/auth.store";
 import { useStationStore } from "@/features/stores/station.store";
 import { StationDialog } from "@/components/station/StationDialog";
 import { FleetDialog } from "@/components/fleet/FleetDialog";
+import { ProfileDialog } from "@/components/profile/ProfileDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
 import { RESOURCE_KEYS, RESOURCE_LABEL, hasAny, vaultCap } from "@/lib/game/station/economy";
 import { spaceObjectAt } from "@/lib/game/world/space";
@@ -86,7 +87,7 @@ function WorldScreen() {
           <div className="flex items-center gap-2"><Sparkles className="size-4 text-accent" /><div><div className="text-[9px] uppercase text-muted-foreground">Nanites</div><b className="text-sm">{nanites.toLocaleString()}</b></div></div>
         </div>
         <div className="pointer-events-auto flex items-center gap-3 border border-border bg-card px-3 py-2">
-          <div className="hidden text-right sm:block"><div className="text-xs font-semibold">{player.displayName}</div><div className="text-[9px] uppercase text-primary">Commander</div></div>
+          <ProfileDialog />
           <LoginDialog />
         </div>
       </header>

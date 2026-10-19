@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { STARTING_BALANCE, STARTING_LEVELS, canAfford, upgradeCost, type BuildingId, type BuildingLevels } from "@/lib/game/station/buildings";
 import { addResources, exposedYield, hasAny, subResources, type Resources } from "@/lib/game/station/economy";
+import { usePlayerStore } from "@/features/stores/player.store";
 
 type StationState = {
   /** Secured RIM token + Titanium, Plasma, Rations. */
@@ -26,6 +27,7 @@ export const useStationStore = create<StationState>((set, get) => ({
     const amount = get().exposed();
     if (!hasAny(amount)) return null;
     set((s) => ({ balance: addResources(s.balance, amount), lastCollectedAt: Date.now() }));
+    usePlayerStore.getState().recordHaul();
     return amount;
   },
   upgrade: (id) => {
@@ -33,6 +35,7 @@ export const useStationStore = create<StationState>((set, get) => ({
     const cost = upgradeCost(id, levels[id]);
     if (!canAfford(balance, cost)) return false;
     set({ balance: subResources(balance, cost), levels: { ...levels, [id]: levels[id] + 1 } });
+    usePlayerStore.getState().recordStationUpgrade(cost.rim);
     return true;
   },
 }));
