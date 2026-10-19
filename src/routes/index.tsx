@@ -81,7 +81,7 @@ function WorldScreen() {
           <div className="hidden h-7 border-l border-border sm:block" />
           <div className="flex items-center gap-2"><Box className="size-4 text-primary" /><div><div className="text-[9px] uppercase text-muted-foreground">Alloy</div><b className="text-sm">{alloy.toLocaleString()}</b></div></div>
           <div className="flex items-center gap-2"><Sparkles className="size-4 text-accent" /><div><div className="text-[9px] uppercase text-muted-foreground">Sparks</div><b className="text-sm">{sparks}</b></div></div>
-          <div className="hidden text-xs text-muted-foreground lg:block">Storage <span className="ml-2 text-foreground">0 / 1,000</span></div>
+          <div className="hidden items-center gap-2 lg:flex"><PackageCheck className="size-4 text-primary" /><div><div className="text-[9px] uppercase text-muted-foreground">Exposed</div><b className="text-sm">{exposed.toLocaleString()} / {cap.toLocaleString()}</b></div></div>
         </div>
         <div className="pointer-events-auto flex items-center gap-3 border border-border bg-card px-3 py-2">
           <div className="hidden text-right sm:block"><div className="text-xs font-semibold">{player.displayName}</div><div className="text-[9px] uppercase text-primary">Commander</div></div>
