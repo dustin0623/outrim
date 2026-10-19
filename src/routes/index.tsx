@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Box, Crosshair, Globe2, Hexagon, Orbit, Satellite, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Box, Crosshair, Globe2, Hexagon, Orbit, PackageCheck, Satellite, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { useAuthStore } from "@/features/stores/auth.store";
 import { useStationStore } from "@/features/stores/station.store";
 import { StationDialog } from "@/components/station/StationDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
+import { storehouseCap } from "@/lib/game/station/economy";
 import { spaceObjectAt } from "@/lib/game/world/space";
 import starfield from "@/assets/world/starfield.jpg";
 import station from "@/assets/world/station.png";
@@ -54,9 +56,19 @@ function WorldScreen() {
   const player = useAuthStore((s) => s.player);
   const alloy = useStationStore((s) => s.securedAlloy);
   const sparks = useStationStore((s) => s.sparks);
+  const levels = useStationStore((s) => s.levels);
+  const exposedOf = useStationStore((s) => s.exposed);
+  const secureHaul = useStationStore((s) => s.secureHaul);
   const [selected, setSelected] = useState<Hex | null>(HOME);
   const [recenter, setRecenter] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 5000);
+    return () => clearInterval(t);
+  }, []);
   if (!player) return null;
+  const exposed = exposedOf();
+  const cap = storehouseCap(levels);
   const object = selected ? spaceObjectAt(selected) : null;
   const art = object?.kind === "station" ? station : object?.variant === "ocean" ? ocean : mineral;
 
@@ -69,7 +81,7 @@ function WorldScreen() {
           <div className="hidden h-7 border-l border-border sm:block" />
           <div className="flex items-center gap-2"><Box className="size-4 text-primary" /><div><div className="text-[9px] uppercase text-muted-foreground">Alloy</div><b className="text-sm">{alloy.toLocaleString()}</b></div></div>
           <div className="flex items-center gap-2"><Sparkles className="size-4 text-accent" /><div><div className="text-[9px] uppercase text-muted-foreground">Sparks</div><b className="text-sm">{sparks}</b></div></div>
-          <div className="hidden text-xs text-muted-foreground lg:block">Storage <span className="ml-2 text-foreground">0 / 1,000</span></div>
+          <div className="hidden items-center gap-2 lg:flex"><PackageCheck className="size-4 text-primary" /><div><div className="text-[9px] uppercase text-muted-foreground">Exposed</div><b className="text-sm">{exposed.toLocaleString()} / {cap.toLocaleString()}</b></div></div>
         </div>
         <div className="pointer-events-auto flex items-center gap-3 border border-border bg-card px-3 py-2">
           <div className="hidden text-right sm:block"><div className="text-xs font-semibold">{player.displayName}</div><div className="text-[9px] uppercase text-primary">Commander</div></div>
@@ -97,6 +109,19 @@ function WorldScreen() {
           </dl>
           {object?.kind === "planet" && <p className="mt-3 border-t border-border pt-3 text-[10px] text-muted-foreground">Expeditions not yet available</p>}
           <Button variant="secondary" className="mt-4 w-full text-xs" onClick={() => { setSelected(HOME); setRecenter((n) => n + 1); }}><Satellite className="size-4" /> Your station <Crosshair className="ml-auto size-3" /></Button>
+          <div className="mt-2 border border-border bg-background/60 p-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="flex items-center gap-2 text-muted-foreground"><PackageCheck className="size-4 text-primary" /> Exposed Alloy</span>
+              <span className="font-mono"><b className="text-foreground">{exposed.toLocaleString()}</b> / {cap.toLocaleString()}</span>
+            </div>
+            <div className="mt-2 h-1.5 w-full bg-primary/20"><div className="h-full bg-primary transition-all" style={{ width: `${Math.min(100, (exposed / cap) * 100)}%` }} /></div>
+            <Button
+              size="sm" className="mt-2 w-full text-xs" disabled={exposed <= 0}
+              onClick={() => { const n = secureHaul(); if (n > 0) toast.success(`Secured ${n.toLocaleString()} Alloy`); }}
+            >
+              <PackageCheck className="size-4" /> Secure haul
+            </Button>
+          </div>
           <StationDialog />
         </div>
       </aside>

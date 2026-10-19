@@ -31,3 +31,7 @@
 ## Station management
 - [x] Six station modules with instant pay-to-upgrade (no construction queue), Command Rig gates levels
 - [ ] Save station levels and Alloy between sessions (needs saved player data)
+
+## Resource & extraction engine
+- [x] Extractor produces Exposed Alloy over time (60 × level / hr), capped by Storehouse (1,000 × level)
+- [x] Secure Haul moves exposed Alloy into the spendable secured vault; HUD + sector panel show both balances
