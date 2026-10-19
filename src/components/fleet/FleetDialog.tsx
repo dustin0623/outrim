@@ -3,7 +3,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useEquipmentStore } from "@/features/stores/equipment.store";
-import { useStationStore } from "@/features/stores/station.store";
+import { useOwnedItems } from "@/features/stores/items.store";
+import { useAuthStore } from "@/features/stores/auth.store";
 import {
   CRATE_COST_RIM, MAX_ITEM_LEVEL, RARITY_META, SLOTS, SLOT_META, STATS, STAT_LABEL,
   effectiveStats, fleetTotals, salvageValue, upgradeCostNanites, type Equipment, type Rarity, type SlotKey,
@@ -34,9 +35,10 @@ function StatList({ item }: { item: Equipment }) {
 }
 
 export function FleetDialog() {
-  const { items, equipped, openCrate, equip, unequip, salvage, upgrade } = useEquipmentStore();
-  const rim = useStationStore((s) => s.balance.rim);
-  const nanites = useStationStore((s) => s.nanites);
+  const { items: allItems, equipped, openCrate, buyCrates, equip, unequip, salvage, upgrade } = useEquipmentStore();
+  const owner = useAuthStore((s) => s.player?.id);
+  const items = allItems.filter((i) => i.ownerId === owner && !i.marketPrice);
+  const { rim, nanites, "equipment-crate": crates } = useOwnedItems();
   const equippedItems = SLOTS.map((s) => items.find((i) => i.id === equipped[s])).filter(Boolean) as Equipment[];
   const totals = fleetTotals(equippedItems);
   const hold = items.filter((i) => equipped[i.slot] !== i.id);
@@ -78,10 +80,10 @@ export function FleetDialog() {
 
         <div className="flex items-center justify-between border-t border-border pt-3">
           <h3 className="text-sm font-semibold uppercase">Hangar ({hold.length})</h3>
-          <Button size="sm" disabled={rim < CRATE_COST_RIM} onClick={() => {
+          <div className="flex flex-wrap gap-2"><Button size="sm" variant="outline" disabled={rim < CRATE_COST_RIM} onClick={() => buyCrates(1)}>Buy crate · {CRATE_COST_RIM} RIM</Button><Button size="sm" disabled={crates < 1} onClick={() => {
             const it = openCrate();
             if (it) toast.success(`Salvage crate: ${name(it)}`);
-          }}><Gem className="size-4" /> Open crate · {CRATE_COST_RIM} RIM</Button>
+          }}><Gem className="size-4" /> Open crate · {crates} owned</Button></div>
         </div>
         {hold.length === 0 ? <p className="text-xs text-muted-foreground">No spare modules. Open a salvage crate to roll new equipment.</p> : (
           <div className="grid gap-2 sm:grid-cols-3">

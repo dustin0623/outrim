@@ -1446,5 +1446,8 @@ Preserve the architecture unless the user explicitly requests an architectural c
 - World artwork lives in public/assets/world and is referenced by literal /assets/world/... URLs, never bundled from src/assets (why: user requires assets out of src; template mandates public URLs for game assets).
 - Demo email login is created only when import.meta.env.DEV (why: no shared backdoor in production).
 - Station building rules are pure functions in src/lib/game/station; UI state lives in src/features/stores/station.store.ts (why: rules stay testable and move to the server unchanged).
-- Fleet equipment rules are pure functions in src/lib/game/equipment; UI state in src/features/stores/equipment.store.ts, which debits/credits the station store (why: one balance source, rules testable).
+- Fleet equipment rules are pure functions in src/lib/game/equipment; UI state in src/features/stores/equipment.store.ts, which debits/credits the item store (why: one balance source, rules testable).
 - Operator profile: leveling formula and cosmetic catalog are pure modules in src/lib/game/profile (reference formulas), UI state in src/features/stores/player.store.ts, cosmetics served from public/assets/{avatars,banners,backgrounds} by literal URLs (why: level math testable, one XP source credited by station/equipment stores).
+
+- Stackable quantities live in the owner-scoped items store; unique gear lives in the equipment store with owner and listing metadata. Station state never holds spendable balances (why: separate future items/equipments tables and one quantity source).
+- Marketplace is a session-only simulated market; purchases validate listing state and expected price before transferring RIM and ownership synchronously, with no fee (why: no live settlement or persistence is connected).
