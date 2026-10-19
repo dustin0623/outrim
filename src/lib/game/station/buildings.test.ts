@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { STARTING_LEVELS, upgradeBlock, upgradeCost } from "./buildings";
+import { BUILDINGS, STARTING_BALANCE, canAfford, upgradeCost } from "./buildings";
 
 describe("station upgrades", () => {
-  it("Extractor 1→2 costs 320 Alloy", () => expect(upgradeCost("extractor", 2)).toBe(320));
-  it("modules cannot exceed the Command Rig level", () => expect(upgradeBlock("extractor", STARTING_LEVELS, 10000)).toBe("hq"));
-  it("Defense Array 0→1 is allowed at Command Rig 1", () => expect(upgradeBlock("defense", STARTING_LEVELS, 500)).toBeNull());
-  it("blocks when Alloy is short", () => expect(upgradeBlock("hq", STARTING_LEVELS, 479)).toBe("alloy"));
-  it("stops at level 10", () => expect(upgradeBlock("hq", { ...STARTING_LEVELS, hq: 10 }, 1e9)).toBe("max"));
+  it("has exactly four upgradable stats", () => expect(BUILDINGS.map((b) => b.id)).toEqual(["vault", "mining", "attack", "defense"]));
+  it("RIM cost is max(1, level²)", () => {
+    expect(upgradeCost("mining", 0).rim).toBe(1);
+    expect(upgradeCost("mining", 1).rim).toBe(1);
+    expect(upgradeCost("mining", 4).rim).toBe(16);
+  });
+  it("level 1 is affordable with the starting balance", () => expect(canAfford(STARTING_BALANCE, upgradeCost("vault", 1))).toBe(true));
+  it("blocks when RIM is short", () => expect(canAfford({ ...STARTING_BALANCE, rim: 0 }, upgradeCost("attack", 1))).toBe(false));
 });

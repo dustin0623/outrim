@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { RARITIES, RARITY_META, SLOTS, rollItem, rollRarity, salvageValue, upgradeCostSparks, upgradedStats } from "./fleet";
+import { RARITIES, RARITY_META, SLOTS, rollItem, rollRarity, salvageValue, upgradeCostNanites, upgradedStats } from "./fleet";
 
 const fixed = (v: number) => () => v;
 
@@ -28,7 +28,7 @@ describe("fleet equipment (reference formulas)", () => {
   it("salvage, forge cost and x1.05 upgrade match reference", () => {
     const item = { id: "x", slot: "mothership" as const, rarity: "common" as const, stats: { luck: 1, attack: 10 }, level: 2 };
     expect(salvageValue(item)).toBe(15);
-    expect(upgradeCostSparks(item)).toBe(1.49);
+    expect(upgradeCostNanites(item)).toBe(1.49);
     expect(upgradedStats(item.stats)).toEqual({ luck: 1.05, attack: 10.5 });
   });
 });

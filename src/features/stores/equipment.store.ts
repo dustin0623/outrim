@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { CRATE_COST_ALLOY, MAX_ITEM_LEVEL, rollItem, salvageValue, upgradeCostSparks, upgradedStats, type Equipment, type SlotKey } from "@/lib/game/equipment/fleet";
+import { CRATE_COST_RIM, MAX_ITEM_LEVEL, rollItem, salvageValue, upgradeCostNanites, upgradedStats, type Equipment, type SlotKey } from "@/lib/game/equipment/fleet";
 import { useStationStore } from "@/features/stores/station.store";
 
 type EquipmentState = {
@@ -19,8 +19,8 @@ export const useEquipmentStore = create<EquipmentState>((set, get) => ({
   equipped: {},
   openCrate: () => {
     const station = useStationStore.getState();
-    if (station.securedAlloy < CRATE_COST_ALLOY) return null;
-    useStationStore.setState({ securedAlloy: station.securedAlloy - CRATE_COST_ALLOY });
+    if (station.balance.rim < CRATE_COST_RIM) return null;
+    useStationStore.setState({ balance: { ...station.balance, rim: Math.round((station.balance.rim - CRATE_COST_RIM) * 100) / 100 } });
     const item = rollItem(Math.random, newId());
     set((s) => ({ items: [...s.items, item] }));
     return item;
@@ -34,18 +34,18 @@ export const useEquipmentStore = create<EquipmentState>((set, get) => ({
     const { items, equipped } = get();
     const item = items.find((i) => i.id === id);
     if (!item || equipped[item.slot] === id) return 0;
-    const sparks = salvageValue(item);
-    useStationStore.setState((s) => ({ sparks: s.sparks + sparks }));
+    const nanites = salvageValue(item);
+    useStationStore.setState((s) => ({ nanites: Math.round((s.nanites + nanites) * 100) / 100 }));
     set({ items: items.filter((i) => i.id !== id) });
-    return sparks;
+    return nanites;
   },
   upgrade: (id) => {
     const item = get().items.find((i) => i.id === id);
     if (!item || item.level >= MAX_ITEM_LEVEL) return false;
-    const cost = upgradeCostSparks(item);
-    const { sparks } = useStationStore.getState();
-    if (sparks < cost) return false;
-    useStationStore.setState({ sparks: Math.round((sparks - cost) * 100) / 100 });
+    const cost = upgradeCostNanites(item);
+    const { nanites } = useStationStore.getState();
+    if (nanites < cost) return false;
+    useStationStore.setState({ nanites: Math.round((nanites - cost) * 100) / 100 });
     set((s) => ({ items: s.items.map((i) => (i.id === id ? { ...i, level: i.level + 1, stats: upgradedStats(i.stats) } : i)) }));
     return true;
   },
