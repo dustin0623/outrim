@@ -4,7 +4,7 @@ import { currentOwner, useItemsStore } from "@/features/stores/items.store";
 import { usePlayerStore } from "@/features/stores/player.store";
 import { XP_PER_NANITE } from "@/lib/game/profile/level";
 
-export type OwnedEquipment = Equipment & { ownerId: string; sellerName?: string; marketPrice?: number; listedAt?: number };
+export type OwnedEquipment = Equipment & { ownerId: string; sellerName?: string | undefined; marketPrice?: number | undefined; listedAt?: number | undefined };
 
 type EquipmentState = {
   items: OwnedEquipment[];
@@ -13,7 +13,7 @@ type EquipmentState = {
   list: (id: string, price: number, sellerName: string) => boolean;
   cancel: (id: string) => boolean;
   purchase: (id: string, expectedPrice: number) => boolean;
-  openCrate: () => Equipment | null;
+  openCrate: () => OwnedEquipment | null;
   equip: (id: string) => void;
   unequip: (slot: SlotKey) => void;
   salvage: (id: string) => number;
@@ -28,9 +28,7 @@ export const useEquipmentStore = create<EquipmentState>((set, get) => ({
   buyCrates: (quantity) => {
     if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 25) return false;
     const stock = useItemsStore.getState();
-    if (!stock.debit("rim", CRATE_COST_RIM * quantity)) return false;
-    stock.credit("equipment-crate", quantity);
-    return true;
+    return stock.buyContainers(quantity, CRATE_COST_RIM);
   },
   list: (id, price, sellerName) => {
     const item = get().items.find((i) => i.id === id);
@@ -64,7 +62,11 @@ export const useEquipmentStore = create<EquipmentState>((set, get) => ({
     const item = get().items.find((i) => i.id === id);
     if (item && item.ownerId === currentOwner() && !item.marketPrice) set((s) => ({ equipped: { ...s.equipped, [item.slot]: id } }));
   },
-  unequip: (slot) => set((s) => { const e = { ...s.equipped }; delete e[slot]; return { equipped: e }; }),
+  unequip: (slot) => set((s) => {
+    const item = s.items.find((i) => i.id === s.equipped[slot]);
+    if (!item || item.ownerId !== currentOwner()) return s;
+    const e = { ...s.equipped }; delete e[slot]; return { equipped: e };
+  }),
   salvage: (id) => {
     const { items, equipped } = get();
     const item = items.find((i) => i.id === id);

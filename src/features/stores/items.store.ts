@@ -9,6 +9,7 @@ type ItemsState = {
   debit: (id: ItemId, amount: number) => boolean;
   creditBatch: (batch: Partial<Quantities>) => boolean;
   debitBatch: (batch: Partial<Quantities>) => boolean;
+  buyContainers: (quantity: number, unitPrice: number) => boolean;
   transferRim: (buyer: string, seller: string, amount: number) => boolean;
 };
 export function ownedItems(accounts: Record<string, Quantities>, owner: string | null): Quantities {
@@ -34,6 +35,15 @@ export const useItemsStore = create<ItemsState>((set, get) => {
     debit: (id, amount) => change({ [id]: amount }, -1),
     creditBatch: (batch) => change(batch, 1),
     debitBatch: (batch) => change(batch, -1),
+    buyContainers: (quantity, unitPrice) => {
+      const owner = currentOwner();
+      if (!owner || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > 25 || !Number.isFinite(unitPrice) || unitPrice <= 0) return false;
+      const paid = applyItemBatch(ownedItems(get().accounts, owner), { rim: unitPrice * quantity }, -1);
+      const next = paid && applyItemBatch(paid, { "equipment-crate": quantity }, 1);
+      if (!next) return false;
+      set((s) => ({ accounts: { ...s.accounts, [owner]: next } }));
+      return true;
+    },
     transferRim: (buyer, seller, amount) => {
       if (buyer === seller || amount <= 0) return false;
       const b = applyItemBatch(ownedItems(get().accounts, buyer), { rim: amount }, -1);
