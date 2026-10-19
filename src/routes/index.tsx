@@ -109,6 +109,19 @@ function WorldScreen() {
           </dl>
           {object?.kind === "planet" && <p className="mt-3 border-t border-border pt-3 text-[10px] text-muted-foreground">Expeditions not yet available</p>}
           <Button variant="secondary" className="mt-4 w-full text-xs" onClick={() => { setSelected(HOME); setRecenter((n) => n + 1); }}><Satellite className="size-4" /> Your station <Crosshair className="ml-auto size-3" /></Button>
+          <div className="mt-2 border border-border bg-background/60 p-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="flex items-center gap-2 text-muted-foreground"><PackageCheck className="size-4 text-primary" /> Exposed Alloy</span>
+              <span className="font-mono"><b className="text-foreground">{exposed.toLocaleString()}</b> / {cap.toLocaleString()}</span>
+            </div>
+            <div className="mt-2 h-1.5 w-full bg-primary/20"><div className="h-full bg-primary transition-all" style={{ width: `${Math.min(100, (exposed / cap) * 100)}%` }} /></div>
+            <Button
+              size="sm" className="mt-2 w-full text-xs" disabled={exposed <= 0}
+              onClick={() => { const n = secureHaul(); if (n > 0) toast.success(`Secured ${n.toLocaleString()} Alloy`); }}
+            >
+              <PackageCheck className="size-4" /> Secure haul
+            </Button>
+          </div>
           <StationDialog />
         </div>
       </aside>
