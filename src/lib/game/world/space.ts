@@ -29,5 +29,5 @@ export function spaceObjectAt(hex: Hex): SpaceObject | null {
   const hash = (Math.imul(hex.q, 73856093) ^ Math.imul(hex.r, 19349663)) >>> 0;
   if (!nearby && hash % 19 !== 0) return null;
   const variant = nearby?.variant ?? (hash % 2 === 0 ? "ocean" : "mineral");
-  return { kind: "planet", name: nearby?.name ?? `${variant === "ocean" ? "Nereid" : "Ferrum"} ${hex.q}-${hex.r}`, variant, resource: "Alloy" };
+  return { kind: "planet", name: nearby?.name ?? `${variant === "ocean" ? "Nereid" : "Ferrum"} ${hex.q}-${hex.r}`, variant, resource: "Boss encounter" };
 }

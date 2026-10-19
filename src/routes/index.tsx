@@ -11,7 +11,7 @@ import { useStationStore } from "@/features/stores/station.store";
 import { StationDialog } from "@/components/station/StationDialog";
 import { FleetDialog } from "@/components/fleet/FleetDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
-import { storehouseCap } from "@/lib/game/station/economy";
+import { RESOURCE_KEYS, RESOURCE_LABEL, hasAny, vaultCap } from "@/lib/game/station/economy";
 import { spaceObjectAt } from "@/lib/game/world/space";
 const starfield = "/assets/world/starfield.jpg";
 const station = "/assets/world/station.png";
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Outrim — Space Frontier" },
-      { name: "description", content: "Explore Outrim's 250×250 space-sector world, command your orbital station and discover resource planets." },
+      { name: "description", content: "Explore Outrim's 250×250 space-sector world, command your orbital station and challenge boss worlds." },
       { property: "og:title", content: "Outrim — Space Frontier" },
       { property: "og:description", content: "Your station. A vast space frontier. Worlds waiting to be explored." },
       { property: "og:type", content: "website" },
@@ -55,8 +55,8 @@ function Landing() {
 
 function WorldScreen() {
   const player = useAuthStore((s) => s.player);
-  const alloy = useStationStore((s) => s.securedAlloy);
-  const sparks = useStationStore((s) => s.sparks);
+  const balance = useStationStore((s) => s.balance);
+  const nanites = useStationStore((s) => s.nanites);
   const levels = useStationStore((s) => s.levels);
   const exposedOf = useStationStore((s) => s.exposed);
   const secureHaul = useStationStore((s) => s.secureHaul);
@@ -69,7 +69,7 @@ function WorldScreen() {
   }, []);
   if (!player) return null;
   const exposed = exposedOf();
-  const cap = storehouseCap(levels);
+  const cap = vaultCap(levels);
   const object = selected ? spaceObjectAt(selected) : null;
   const art = object?.kind === "station" ? station : object?.variant === "ocean" ? ocean : mineral;
 
@@ -80,9 +80,10 @@ function WorldScreen() {
         <div className="pointer-events-auto flex min-w-0 items-center gap-4 border border-border bg-card px-4 py-3 sm:gap-7">
           <div className="flex items-center gap-2"><Orbit className="size-6 text-primary" /><h1 className="text-xl font-black uppercase">Outrim</h1></div>
           <div className="hidden h-7 border-l border-border sm:block" />
-          <div className="flex items-center gap-2"><Box className="size-4 text-primary" /><div><div className="text-[9px] uppercase text-muted-foreground">Alloy</div><b className="text-sm">{alloy.toLocaleString()}</b></div></div>
-          <div className="flex items-center gap-2"><Sparkles className="size-4 text-accent" /><div><div className="text-[9px] uppercase text-muted-foreground">Sparks</div><b className="text-sm">{sparks}</b></div></div>
-          <div className="hidden items-center gap-2 lg:flex"><PackageCheck className="size-4 text-primary" /><div><div className="text-[9px] uppercase text-muted-foreground">Exposed</div><b className="text-sm">{exposed.toLocaleString()} / {cap.toLocaleString()}</b></div></div>
+          {RESOURCE_KEYS.map((k) => (
+            <div key={k} className="flex items-center gap-2"><Box className="size-4 text-primary" /><div><div className="text-[9px] uppercase text-muted-foreground">{RESOURCE_LABEL[k]}</div><b className="text-sm">{balance[k].toLocaleString()}</b></div></div>
+          ))}
+          <div className="flex items-center gap-2"><Sparkles className="size-4 text-accent" /><div><div className="text-[9px] uppercase text-muted-foreground">Nanites</div><b className="text-sm">{nanites.toLocaleString()}</b></div></div>
         </div>
         <div className="pointer-events-auto flex items-center gap-3 border border-border bg-card px-3 py-2">
           <div className="hidden text-right sm:block"><div className="text-xs font-semibold">{player.displayName}</div><div className="text-[9px] uppercase text-primary">Commander</div></div>
@@ -101,7 +102,7 @@ function WorldScreen() {
         <div className="p-4">
           <div className="mb-4 flex items-center gap-3">
             {object ? <img src={art} alt="" width={64} height={64} className="size-16 shrink-0 object-contain" loading="lazy" /> : <Orbit className="m-3 size-10 shrink-0 text-muted-foreground" />}
-            <div className="min-w-0"><p className="mb-1 text-[9px] uppercase text-primary">{object?.kind === "station" ? (object.variant === "own" ? "Home sector" : "Occupied sector") : object ? "Gathering world" : "Unoccupied sector"}</p><h2 className="text-lg font-semibold">{object?.name ?? "Deep Space"}</h2></div>
+            <div className="min-w-0"><p className="mb-1 text-[9px] uppercase text-primary">{object?.kind === "station" ? (object.variant === "own" ? "Home sector" : "Occupied sector") : object ? "Boss world" : "Unoccupied sector"}</p><h2 className="text-lg font-semibold">{object?.name ?? "Deep Space"}</h2></div>
           </div>
           <dl className="space-y-2 text-xs">
             <div className="flex justify-between gap-2"><dt className="text-muted-foreground">Classification</dt><dd>{object?.kind === "station" ? "Orbital station" : object ? (object.variant === "ocean" ? "Ocean planet" : "Mineral planet") : "Open space"}</dd></div>
@@ -111,14 +112,16 @@ function WorldScreen() {
           {object?.kind === "planet" && <p className="mt-3 border-t border-border pt-3 text-[10px] text-muted-foreground">Expeditions not yet available</p>}
           <Button variant="secondary" className="mt-4 w-full text-xs" onClick={() => { setSelected(HOME); setRecenter((n) => n + 1); }}><Satellite className="size-4" /> Your station <Crosshair className="ml-auto size-3" /></Button>
           <div className="mt-2 border border-border bg-background/60 p-3">
-            <div className="flex items-center justify-between text-xs">
-              <span className="flex items-center gap-2 text-muted-foreground"><PackageCheck className="size-4 text-primary" /> Exposed Alloy</span>
-              <span className="font-mono"><b className="text-foreground">{exposed.toLocaleString()}</b> / {cap.toLocaleString()}</span>
-            </div>
-            <div className="mt-2 h-1.5 w-full bg-primary/20"><div className="h-full bg-primary transition-all" style={{ width: `${Math.min(100, (exposed / cap) * 100)}%` }} /></div>
+            <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground"><PackageCheck className="size-4 text-primary" /> Unsecured output</div>
+            {RESOURCE_KEYS.map((k) => (
+              <div key={k} className="mt-1">
+                <div className="flex justify-between text-[10px]"><span className="text-muted-foreground">{RESOURCE_LABEL[k]}</span><span className="font-mono"><b className="text-foreground">{exposed[k].toLocaleString()}</b> / {cap[k].toLocaleString()}</span></div>
+                <div className="h-1 w-full bg-primary/20"><div className="h-full bg-primary transition-all" style={{ width: `${Math.min(100, (exposed[k] / cap[k]) * 100)}%` }} /></div>
+              </div>
+            ))}
             <Button
-              size="sm" className="mt-2 w-full text-xs" disabled={exposed <= 0}
-              onClick={() => { const n = secureHaul(); if (n > 0) toast.success(`Secured ${n.toLocaleString()} Alloy`); }}
+              size="sm" className="mt-2 w-full text-xs" disabled={!hasAny(exposed)}
+              onClick={() => { const n = secureHaul(); if (n) toast.success(`Secured ${RESOURCE_KEYS.map((k) => `${n[k]} ${RESOURCE_LABEL[k]}`).join(", ")}`); }}
             >
               <PackageCheck className="size-4" /> Secure haul
             </Button>
