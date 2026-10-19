@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { useEquipmentStore } from "@/features/stores/equipment.store";
 import { initializeDemoMarket, useMarketplaceStore } from "@/features/stores/marketplace.store";
 import { useOwnedItems } from "@/features/stores/items.store";
 import { useAuthStore } from "@/features/stores/auth.store";
-export function MarketplaceDialog({ trigger }: { trigger?: React.ReactNode }) {
+export function MarketplaceDialog({ trigger }: { trigger?: ReactNode }) {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const { tab, setTab } = useMarketplaceStore();
   const owner = useAuthStore((s) => s.player?.id);

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { Bomb, Box, Coins, Flame, Package, Pickaxe, ShieldPlus, Sparkles, Sprout } from "lucide-react";
 import { toast } from "sonner";
@@ -13,7 +14,7 @@ import { CRATE_COST_RIM, RARITIES, RARITY_META } from "@/lib/game/equipment/flee
 import { EquipmentCard, equipmentName } from "./EquipmentCard";
 import { DEFAULT_FILTERS, EquipmentFilters, filterEquipment } from "./EquipmentFilters";
 const ICONS: Record<ItemId, typeof Box> = { rim: Coins, nanites: Sparkles, titanium: Pickaxe, plasma: Flame, rations: Sprout, "equipment-crate": Package, "sabotage-device": Bomb, "help-kit": ShieldPlus };
-export function InventoryDialog({ trigger }: { trigger?: React.ReactNode }) {
+export function InventoryDialog({ trigger }: { trigger?: ReactNode }) {
   const quantities = useOwnedItems();
   const player = useAuthStore((s) => s.player);
   const { items, buyCrates, openCrate } = useEquipmentStore();

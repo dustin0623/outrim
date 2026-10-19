@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { Bomb, Package, ShieldPlus, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
@@ -43,7 +44,7 @@ function StockCard({ id, icon: Icon }: { id: ShopItemId; icon: typeof Package })
   );
 }
 
-export function ShopDialog({ trigger }: { trigger?: React.ReactNode }) {
+export function ShopDialog({ trigger }: { trigger?: ReactNode }) {
   const { rim } = useOwnedItems();
   return (
     <Dialog>

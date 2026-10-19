@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Crown, Flame, Gem, Hammer, Pickaxe, Radio, Rocket, Shield, Ship, Swords } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ function StatList({ item }: { item: Equipment }) {
   );
 }
 
-export function FleetDialog({ trigger }: { trigger?: React.ReactNode }) {
+export function FleetDialog({ trigger }: { trigger?: ReactNode }) {
   const { items: allItems, equipped, openCrate, buyCrates, equip, unequip, salvage, upgrade } = useEquipmentStore();
   const owner = useAuthStore((s) => s.player?.id);
   const items = allItems.filter((i) => i.ownerId === owner && !i.marketPrice);

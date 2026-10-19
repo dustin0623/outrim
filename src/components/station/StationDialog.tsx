@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Box, Coins, Flame, Pickaxe, Radar, Shield, Sprout, Swords } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { RESOURCE_KEYS, RESOURCE_LABEL } from "@/lib/game/station/economy";
 
 const ICONS: Record<BuildingId, typeof Box> = { tribute: Coins, titanium: Pickaxe, plasma: Flame, rations: Sprout, vault: Box, attack: Swords, defense: Shield };
 
-export function StationDialog({ trigger }: { trigger?: React.ReactNode }) {
+export function StationDialog({ trigger }: { trigger?: ReactNode }) {
   const { levels, upgrade } = useStationStore();
   const balance = useOwnedItems();
   return (
