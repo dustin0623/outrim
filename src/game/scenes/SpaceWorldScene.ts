@@ -135,8 +135,11 @@ export class SpaceWorldScene extends Phaser.Scene {
       const size = isStation ? 165 : 114;
       const sprite = this.add.image(0, isStation ? -26 : -12, isStation ? "station" : object.variant).setDisplaySize(size, size);
       const color = Phaser.Display.Color.IntegerToColor(object.variant === "own" ? this.palette.primary : object.variant === "rival" ? this.palette.rival : this.palette.foreground).rgba;
-      const label = this.add.text(0, isStation ? 66 : 60, object.name, { fontFamily: "Arial, sans-serif", fontSize: "12px", color, align: "center" }).setOrigin(0.5);
-      const subtitle = this.add.text(0, isStation ? 83 : 76, isStation ? (object.variant === "own" ? "HOME SECTOR" : "RIVAL STATION") : "ALLOY WORLD", { fontFamily: "Arial, sans-serif", fontSize: "9px", color: Phaser.Display.Color.IntegerToColor(this.palette.muted).rgba }).setOrigin(0.5);
+      // Rasterize glyphs well above screen density so text stays crisp at max zoom (1.8) on HiDPI.
+      const resolution = Math.ceil((window.devicePixelRatio || 1) * 2);
+      const label = this.add.text(0, isStation ? 66 : 60, object.name, { fontFamily: "Arial, sans-serif", fontSize: "13px", fontStyle: "bold", color, align: "center", resolution, stroke: "#000000", strokeThickness: 3 }).setOrigin(0.5);
+      const subtitle = this.add.text(0, isStation ? 84 : 77, isStation ? (object.variant === "own" ? "HOME SECTOR" : "RIVAL STATION") : "ALLOY WORLD", { fontFamily: "Arial, sans-serif", fontSize: "10px", color: Phaser.Display.Color.IntegerToColor(this.palette.muted).rgba, resolution, stroke: "#000000", strokeThickness: 2 }).setOrigin(0.5);
+      label.setLetterSpacing(0.5); subtitle.setLetterSpacing(1);
       const container = this.add.container(p.x, p.y, [sprite, label, subtitle]).setDepth(p.y);
       this.objects.set(key, container);
     }
