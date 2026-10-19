@@ -6,6 +6,8 @@ import { LoginDialog } from "@/components/auth/LoginDialog";
 import { Button } from "@/components/ui/button";
 import { WorldMap } from "@/components/world/WorldMap";
 import { useAuthStore } from "@/features/stores/auth.store";
+import { useStationStore } from "@/features/stores/station.store";
+import { StationDialog } from "@/components/station/StationDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
 import { spaceObjectAt } from "@/lib/game/world/space";
 import starfield from "@/assets/world/starfield.jpg";
@@ -50,6 +52,8 @@ function Landing() {
 
 function WorldScreen() {
   const player = useAuthStore((s) => s.player);
+  const alloy = useStationStore((s) => s.securedAlloy);
+  const sparks = useStationStore((s) => s.sparks);
   const [selected, setSelected] = useState<Hex | null>(HOME);
   const [recenter, setRecenter] = useState(0);
   if (!player) return null;
@@ -63,8 +67,8 @@ function WorldScreen() {
         <div className="pointer-events-auto flex min-w-0 items-center gap-4 border border-border bg-card px-4 py-3 sm:gap-7">
           <div className="flex items-center gap-2"><Orbit className="size-6 text-primary" /><h1 className="text-xl font-black uppercase">Outrim</h1></div>
           <div className="hidden h-7 border-l border-border sm:block" />
-          <div className="flex items-center gap-2"><Box className="size-4 text-primary" /><div><div className="text-[9px] uppercase text-muted-foreground">Alloy</div><b className="text-sm">500</b></div></div>
-          <div className="flex items-center gap-2"><Sparkles className="size-4 text-accent" /><div><div className="text-[9px] uppercase text-muted-foreground">Sparks</div><b className="text-sm">0</b></div></div>
+          <div className="flex items-center gap-2"><Box className="size-4 text-primary" /><div><div className="text-[9px] uppercase text-muted-foreground">Alloy</div><b className="text-sm">{alloy.toLocaleString()}</b></div></div>
+          <div className="flex items-center gap-2"><Sparkles className="size-4 text-accent" /><div><div className="text-[9px] uppercase text-muted-foreground">Sparks</div><b className="text-sm">{sparks}</b></div></div>
           <div className="hidden text-xs text-muted-foreground lg:block">Storage <span className="ml-2 text-foreground">0 / 1,000</span></div>
         </div>
         <div className="pointer-events-auto flex items-center gap-3 border border-border bg-card px-3 py-2">
@@ -93,6 +97,7 @@ function WorldScreen() {
           </dl>
           {object?.kind === "planet" && <p className="mt-3 border-t border-border pt-3 text-[10px] text-muted-foreground">Expeditions not yet available</p>}
           <Button variant="secondary" className="mt-4 w-full text-xs" onClick={() => { setSelected(HOME); setRecenter((n) => n + 1); }}><Satellite className="size-4" /> Your station <Crosshair className="ml-auto size-3" /></Button>
+          <StationDialog />
         </div>
       </aside>
       <div className="pointer-events-none absolute bottom-6 right-24 hidden items-center gap-5 text-[10px] text-muted-foreground md:flex">
