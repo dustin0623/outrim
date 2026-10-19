@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Box, Crosshair, Globe2, Hexagon, Orbit, Satellite, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Box, Crosshair, Globe2, Hexagon, Orbit, PackageCheck, Satellite, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { useAuthStore } from "@/features/stores/auth.store";
 import { useStationStore } from "@/features/stores/station.store";
 import { StationDialog } from "@/components/station/StationDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
+import { storehouseCap } from "@/lib/game/station/economy";
 import { spaceObjectAt } from "@/lib/game/world/space";
 import starfield from "@/assets/world/starfield.jpg";
 import station from "@/assets/world/station.png";
