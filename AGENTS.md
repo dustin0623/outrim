@@ -1441,3 +1441,6 @@ Preserve the architecture unless the user explicitly requests an architectural c
 - The poller (server/smart-contract/polling) reads and writes only through the transactions-pending and transactions-processed repositories (why: it works unchanged on the mock store and on MongoDB).
 
 - Smart-contract worker is unified: server/smart-contract/processor routes `chain:action` to handlers; in mock mode the app runs one poll cycle every few seconds via a dev-only hook calling runTransactionBatch, in live mode a separate worker process runs the same poller (why: one code path, no mock/live duplication).
+
+- World map: pure axial hex math/terrain in src/lib/game/world/hex.ts, Canvas renderer in src/components/world/WorldMap.tsx drawing only visible tiles (why: 62,500 tiles must stay bounded; logic testable without DOM).
+- Demo email login is created only when import.meta.env.DEV (why: no shared backdoor in production).
