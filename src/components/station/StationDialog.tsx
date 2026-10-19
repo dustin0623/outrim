@@ -3,13 +3,15 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useStationStore } from "@/features/stores/station.store";
+import { useOwnedItems } from "@/features/stores/items.store";
 import { BUILDINGS, canAfford, effectAt, upgradeCost, type BuildingId } from "@/lib/game/station/buildings";
 import { RESOURCE_KEYS, RESOURCE_LABEL } from "@/lib/game/station/economy";
 
 const ICONS: Record<BuildingId, typeof Box> = { tribute: Coins, titanium: Pickaxe, plasma: Flame, rations: Sprout, vault: Box, attack: Swords, defense: Shield };
 
 export function StationDialog() {
-  const { levels, balance, upgrade } = useStationStore();
+  const { levels, upgrade } = useStationStore();
+  const balance = useOwnedItems();
   return (
     <Dialog>
       <DialogTrigger asChild>

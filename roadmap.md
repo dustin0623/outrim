@@ -1,5 +1,11 @@
 # Roadmap
 
+## Inventory and marketplace
+- [x] Separate stackable item quantities from equipment; rewire station and fleet payments
+- [x] Inventory with crates and equipment management
+- [x] Marketplace with RIM listing, cancellation and purchase (session-only simulation)
+- [x] Rule tests and signed-in browser verification
+
 ## Solana chain module
 - [x] login event (Phantom, Solflare, Backpack, MetaMask)
 - [x] get-token-balance (SOL + SPL)

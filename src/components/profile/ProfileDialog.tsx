@@ -23,7 +23,7 @@ export function ProfileDialog() {
   const avatarEntry = getCosmeticByKind("avatar", avatar) ?? getCosmeticByKind("avatar", 0)!;
   const bannerEntry = getCosmeticByKind("banner", banner) ?? getCosmeticByKind("banner", 100)!;
   const backgroundEntry = getCosmeticByKind("background", background) ?? getCosmeticByKind("background", 200)!;
-  const equippedItems = SLOTS.map((slot) => items.find((i) => i.id === equipped[slot])).filter(Boolean) as NonNullable<ReturnType<typeof items.find>>[];
+  const equippedItems = SLOTS.map((slot) => items.find((i) => i.id === equipped[slot] && i.ownerId === player.id && !i.marketPrice)).filter(Boolean) as NonNullable<ReturnType<typeof items.find>>[];
   const fleet = fleetTotals(equippedItems);
   const memberSince = new Date(joinedAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 

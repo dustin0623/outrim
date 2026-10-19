@@ -9,6 +9,9 @@ import { WorldMap } from "@/components/world/WorldMap";
 import { useAuthStore } from "@/features/stores/auth.store";
 import { useStationStore } from "@/features/stores/station.store";
 import { StationDialog } from "@/components/station/StationDialog";
+import { InventoryDialog } from "@/components/inventory/InventoryDialog";
+import { MarketplaceDialog } from "@/components/marketplace/MarketplaceDialog";
+import { useOwnedItems } from "@/features/stores/items.store";
 import { FleetDialog } from "@/components/fleet/FleetDialog";
 import { ProfileDialog } from "@/components/profile/ProfileDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
@@ -56,8 +59,8 @@ function Landing() {
 
 function WorldScreen() {
   const player = useAuthStore((s) => s.player);
-  const balance = useStationStore((s) => s.balance);
-  const nanites = useStationStore((s) => s.nanites);
+  const balance = useOwnedItems();
+  const nanites = balance.nanites;
   const levels = useStationStore((s) => s.levels);
   const exposedOf = useStationStore((s) => s.exposed);
   const secureHaul = useStationStore((s) => s.secureHaul);
@@ -78,7 +81,7 @@ function WorldScreen() {
     <main className="relative h-dvh w-full overflow-hidden bg-background text-foreground">
       <WorldMap selected={selected} onSelect={setSelected} recenterKey={recenter} />
       <header className="pointer-events-none absolute inset-x-0 top-0 flex flex-wrap items-start justify-between gap-2 p-3 sm:p-5">
-        <div className="pointer-events-auto flex min-w-0 items-center gap-4 border border-border bg-card px-4 py-3 sm:gap-7">
+        <div className="pointer-events-auto flex min-w-0 items-center flex-wrap gap-3 border border-border bg-card px-4 py-3 sm:gap-5">
           <div className="flex items-center gap-2"><Orbit className="size-6 text-primary" /><h1 className="text-xl font-black uppercase">Outrim</h1></div>
           <div className="hidden h-7 border-l border-border sm:block" />
           {RESOURCE_KEYS.map((k) => (
@@ -87,6 +90,8 @@ function WorldScreen() {
           <div className="flex items-center gap-2"><Sparkles className="size-4 text-accent" /><div><div className="text-[9px] uppercase text-muted-foreground">Nanites</div><b className="text-sm">{nanites.toLocaleString()}</b></div></div>
         </div>
         <div className="pointer-events-auto flex items-center gap-3 border border-border bg-card px-3 py-2">
+          <InventoryDialog />
+          <MarketplaceDialog />
           <ProfileDialog />
           <LoginDialog />
         </div>
@@ -133,7 +138,7 @@ function WorldScreen() {
       </aside>
       <div className="pointer-events-none absolute bottom-6 right-24 hidden items-center gap-5 text-[10px] text-muted-foreground md:flex">
         <span className="flex items-center gap-2"><Satellite className="size-3 text-primary" /> Station</span>
-        <span className="flex items-center gap-2"><Globe2 className="size-3 text-accent" /> Gathering world</span>
+        <span className="flex items-center gap-2"><Globe2 className="size-3 text-accent" /> Boss world</span>
         <span className="font-mono">ALPHA WORLD</span>
       </div>
     </main>
