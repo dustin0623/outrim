@@ -24,7 +24,8 @@
 
 ## TerraCore-inspired systems
 - [x] Study TerraCore mechanics → docs/TERRACORE_GAME_CONTEXT.md
-- [ ] 5-slot equipment system (operator, attacker ships, shield, mining ships, special)
+- [x] 6-slot fleet equipment (mothership, commander, attack wing, shield, mining rig, ECM): crates, equip, upgrade, dismantle
+- [ ] Save fleet equipment between sessions (needs saved player data)
 - [ ] Boss encounters on map worlds (HP, attack, salvage drops, combat log)
 - [ ] Ship roster required to travel to boss worlds
 
