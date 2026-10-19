@@ -1,7 +1,7 @@
 import type { Hex } from "@/lib/game/world/hex";
 
 export type WorldCommand = { type: "center" } | { type: "zoom"; factor: number } | { type: "select"; hex: Hex | null } | { type: "pan"; x: number; y: number };
-export type WorldEvent = { type: "selected"; hex: Hex } | { type: "ready" } | { type: "camera"; zoom: number };
+export type WorldEvent = { type: "selected"; hex: Hex } | { type: "ready" } | { type: "camera"; zoom: number } | { type: "progress"; value: number; stage: string };
 
 /** Per-mounted-world transport, with no React or Phaser runtime dependencies. */
 export class GameBridge {
