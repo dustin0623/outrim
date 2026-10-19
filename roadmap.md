@@ -27,3 +27,7 @@
 - [x] Phaser 3 world with large borderless isometric hex sectors, camera and selection bridge
 - [x] Space-sector inspector and station/planet presentation
 - [x] Verify sign-in, map selection, camera controls and narrow-screen layout
+
+## Station management
+- [x] Six station modules with instant pay-to-upgrade (no construction queue), Command Rig gates levels
+- [ ] Save station levels and Alloy between sessions (needs saved player data)

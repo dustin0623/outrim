@@ -1445,3 +1445,4 @@ Preserve the architecture unless the user explicitly requests an architectural c
 - World map: pure axial geometry and space-object definitions in src/lib/game/world; browser-only Phaser 3 scene in src/game/scenes, mounted by WorldMap and controlled through src/game/bridge/GameBridge (why: keep SSR safe, UI outside Phaser, and rendering bounded to visible sectors).
 - Generated world artwork is bundled from src/assets/world through ES imports (why: generated images remain versioned and resolve in both preview and published builds).
 - Demo email login is created only when import.meta.env.DEV (why: no shared backdoor in production).
+- Station building rules are pure functions in src/lib/game/station; UI state lives in src/features/stores/station.store.ts (why: rules stay testable and move to the server unchanged).
