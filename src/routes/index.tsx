@@ -17,9 +17,6 @@ import { StationTargetDialog } from "@/components/raids/StationTargetDialog";
 import { MailButton, MailDialog } from "@/components/mail/MailDialog";
 import { ShopDialog } from "@/components/shop/ShopDialog";
 import { LeaderboardDialog } from "@/components/leaderboard/LeaderboardDialog";
-import { useOwnedItems } from "@/features/stores/items.store";
-import { FleetDialog } from "@/components/fleet/FleetDialog";
-import { ProfileDialog } from "@/components/profile/ProfileDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
 import { RESOURCE_KEYS, RESOURCE_LABEL, hasAny, vaultCap } from "@/lib/game/station/economy";
 import { spaceObjectAt } from "@/lib/game/world/space";
@@ -67,7 +64,6 @@ function Landing() {
 
 function WorldScreen() {
   const player = useAuthStore((s) => s.player);
-  const balance = useOwnedItems();
   const levels = useStationStore((s) => s.levels);
   const exposedOf = useStationStore((s) => s.exposed);
   const secureHaul = useStationStore((s) => s.secureHaul);
