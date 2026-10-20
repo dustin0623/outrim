@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Minimap } from "@/components/world/Minimap";
 import { GameBridge } from "@/game/bridge/GameBridge";
 import type { Hex } from "@/lib/game/world/hex";
-import { TERRITORIES } from "@/lib/game/world/territories";
 const starfield = "/assets/world/starfield.jpg";
 
 type Props = { selected: Hex | null; onSelect: (h: Hex) => void; recenterKey: number };
@@ -92,7 +91,7 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
         <div className="mb-1 flex items-center justify-between gap-1 px-1">
           <span className="text-[9px] uppercase text-muted-foreground">World map</span>
           <span className="flex">
-            <Button variant="ghost" size="icon" className="size-7" title="Go to Federation Station" aria-label="Go to Federation Station" onClick={() => bridge.command({ type: "goto", hex: TERRITORIES[4] })}><Landmark className="size-4" /></Button>
+            <Button variant="ghost" size="icon" className="size-7" title="Go to Federation Station" aria-label="Go to Federation Station" onClick={() => bridge.command({ type: "goto", hex: { q: 125, r: 125 } })}><Landmark className="size-4" /></Button>
             <Button variant="ghost" size="icon" className="size-7" title="Center on your station" aria-label="Center on your station" onClick={() => bridge.command({ type: "center" })}><Crosshair className="size-4" /></Button>
           </span>
         </div>
