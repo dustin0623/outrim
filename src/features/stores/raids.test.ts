@@ -32,7 +32,7 @@ describe("mock pvp raids", () => {
   });
 
   it("scouting spends one recon drone and reports troop composition with expiry", () => {
-    const before = accountOf(owner)?.targets[0].troops;
+    const before = accountOf(owner)?.targets[0]?.troops;
     if (!before) throw new Error("account not initialized");
     expect(useRaidsStore.getState().scout("sample-scout")).toBe(true);
     expect(balances()["recon-drone"]).toBe(0);
