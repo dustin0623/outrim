@@ -25,8 +25,8 @@ describe("raid odds", () => {
 
 describe("free vault space", () => {
   it("subtracts secured and exposed from capacity, never below zero", () => {
-    const free = freeVault({ rim: 10, titanium: 1000, plasma: 1000, rations: 1000 }, { rim: 4, titanium: 100, plasma: 100, rations: 100 }, { rim: 6, titanium: 950, plasma: 950, rations: 950 });
-    expect(free).toEqual({ rim: 0, titanium: 50, plasma: 50, rations: 50 });
+    const free = freeVault({ rim: 10, titanium: 1000, plasma: 1000, rations: 1000 }, { rim: 4, titanium: 100, plasma: 100, rations: 100 }, { rim: 6, titanium: 950, plasma: 700, rations: 950 });
+    expect(free).toEqual({ rim: 0, titanium: 0, plasma: 200, rations: 0 });
   });
 });
 
@@ -49,9 +49,9 @@ describe("raid resolution", () => {
     const outcome = resolveRaid(attacker, defender, exposed, free, stub([0.5, 0.5, 0.9]));
     expect(outcome.success).toBe(true);
     expect(outcome.exposure).toBeCloseTo(0.225, 5);
-    expect(outcome.loot.titanium).toBeCloseTo(1000 * 0.225, 5);
-    expect(outcome.loot.plasma).toBeCloseTo(500 * 0.225, 5);
-    expect(outcome.loot.rim).toBeCloseTo(5 * 0.225, 2);
+    expect(outcome.loot.titanium).toBe(225); // floor(1000 * 0.225)
+    expect(outcome.loot.plasma).toBe(112); // floor(500 * 0.225)
+    expect(outcome.loot.rim).toBeCloseTo(1.12, 5); // RIM keeps 2 decimals
   });
   it("doubles exposure on a critical breach", () => {
     const outcome = resolveRaid(attacker, defender, exposed, free, stub([0.5, 0.5, 0.4]));
