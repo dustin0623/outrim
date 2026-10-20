@@ -5,7 +5,7 @@
 - [x] Five chest rarities, item shards, 100-shard crafting and tactical supplies
 - [x] Expedition dispatch, countdown, speed-up, claim and HUD integration
 - [x] Rule tests and signed-in end-to-end verification
-- [ ] Boss expeditions: travel, base/equipment combat, battle report and rewards
+- [x] Boss expeditions: travel, base/equipment combat, battle report and rewards; signed-in desktop/mobile verification
 - [ ] Live player reconnaissance and Plasma raids (blocked: multiplayer targets and authoritative combat settlement)
 
 ## Station costs and troops (done: 3 ground + 3 ships, instant, resources only)
@@ -51,8 +51,8 @@
 - [x] Study TerraCore mechanics → docs/TERRACORE_GAME_CONTEXT.md
 - [x] 6-slot fleet equipment (mothership, commander, attack wing, shield, mining rig, ECM): crates, equip, upgrade, dismantle
 - [ ] Save fleet equipment between sessions (needs saved player data)
-- [ ] Boss encounters on map worlds (HP, attack, salvage drops, combat log)
-- [ ] Ship roster required to travel to boss worlds
+- [x] Boss encounters in Expedition Command (HP, attack, shard drops, combat log; alpha balance)
+- [x] Equipped Mothership required to travel to boss destinations
 
 ## Space world update
 - [x] Generated starfield, isometric station and gathering-planet artwork
