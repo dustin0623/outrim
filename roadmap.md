@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Operator rankings
-- [ ] Reference-weighted ranking rules and tests
-- [ ] Rankings dialog, HUD access, current operator and pagination
-- [ ] Verify signed-in rankings and narrow-screen layout
+- [x] Reference-weighted ranking rules and tests
+- [x] Rankings dialog, HUD access, current operator and pagination
+- [x] Verify signed-in rankings and narrow-screen layout
 
 ## Inventory and marketplace
 - [x] Separate stackable item quantities from equipment; rewire station and fleet payments
