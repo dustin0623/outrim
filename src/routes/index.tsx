@@ -15,6 +15,7 @@ import { MarketplaceDialog } from "@/components/marketplace/MarketplaceDialog";
 import { WorldDialog } from "@/components/expeditions/WorldDialog";
 import { StationTargetDialog } from "@/components/raids/StationTargetDialog";
 import { MailButton, MailDialog } from "@/components/mail/MailDialog";
+import { FleetDialog } from "@/components/fleet/FleetDialog";
 import { ShopDialog } from "@/components/shop/ShopDialog";
 import { LeaderboardDialog } from "@/components/leaderboard/LeaderboardDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
