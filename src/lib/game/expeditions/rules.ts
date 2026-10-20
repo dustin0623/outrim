@@ -19,7 +19,7 @@ export const MISSION_META: Record<MissionType, { label: string; primary: StatKey
   fortune: { label: "Fortune Anomaly", primary: "luck", secondary: "evasion", slot: "mothership", destination: "Deep-space anomaly", image: "/assets/world/ocean-planet.png" },
   combat: { label: "Citadel Raid", primary: "attack", secondary: "luck", slot: "attackers", destination: "Hostile citadel", image: "/assets/world/mineral-planet.png" },
 };
-export type Mission = { id: string; day: string; tier: Tier; type: MissionType };
+export type Mission = { id: string; day: string; tier: Tier; type: MissionType; bossId?: string };
 export const utcDay = (now: number) => new Date(now).toISOString().slice(0, 10);
 /** Shared deterministic board; no player or client randomness in mission generation. */
 export function dailyBoard(now: number): Mission[] {
@@ -52,7 +52,7 @@ export function requirementChecks(mission: Mission, level: number, stats: Record
     ...(requiredRarity ? [{ label: `${requiredRarity}+ ${meta.slot}`, ok: Boolean(designated && RARITIES.indexOf(designated.rarity) >= RARITIES.indexOf(requiredRarity)) }] : []),
   ];
 }
-export type ExpeditionSnapshot = { primary: number; secondary: number; item?: Equipment | undefined };
+export type ExpeditionSnapshot = { primary: number; secondary: number; item?: Equipment | undefined; combat?: Record<StatKey, number> };
 export type ExpeditionReward = { items: Partial<Quantities>; xp: number; draws: number };
 export function missionOdds(tier: Tier) { const weights = TIERS[tier].weights; const total = weights.reduce((a, b) => a + b, 0); return RARITIES.map((rarity, index) => ({ rarity, percent: (weights[index] ?? 0) / total * 100 })); }
 export function rewardFor(mission: Mission, snapshot: ExpeditionSnapshot, rng: Rng): ExpeditionReward {

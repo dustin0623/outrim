@@ -4,8 +4,9 @@ import { useEquipmentStore } from "./equipment.store";
 import { useStationStore } from "./station.store";
 import { usePlayerStore } from "./player.store";
 import { levelFromXp } from "@/lib/game/profile/level";
+import { bossBoard, fightBoss, type BattleReport } from "@/lib/game/expeditions/bosses";
 import { acceleratedFinish, dailyBoard, expeditionStats, MISSION_META, requirementChecks, rewardFor, TIERS, type ExpeditionReward, type ExpeditionSnapshot, type Mission } from "@/lib/game/expeditions/rules";
-export type ExpeditionRun = { id: string; owner: string; mission: Mission; startedAt: number; finishAt: number; snapshot: ExpeditionSnapshot; seed: number; claimed: boolean; reward?: ExpeditionReward | undefined };
+export type ExpeditionRun = { id: string; owner: string; mission: Mission; startedAt: number; finishAt: number; snapshot: ExpeditionSnapshot; seed: number; claimed: boolean; reward?: ExpeditionReward | undefined; battle?: BattleReport | undefined };
 type ExpeditionState = {
   runs: ExpeditionRun[]; starters: string[];
   claimStarter: () => boolean;
@@ -27,7 +28,7 @@ export const useExpeditionsStore = create<ExpeditionState>((set, get) => ({
     set((s) => ({ starters: [...s.starters, owner] })); return true;
   },
   dispatch: (id, now = Date.now()) => {
-    const owner = currentOwner(); const mission = dailyBoard(now).find((m) => m.id === id);
+    const owner = currentOwner(); const mission = [...dailyBoard(now), ...bossBoard(now)].find((m) => m.id === id);
     if (!owner || !mission) return null;
     if (get().runs.some((r) => r.owner === owner && (r.mission.id === id || !r.claimed))) return null;
     const equipment = equippedForOwner(); const stats = expeditionStats(useStationStore.getState().levels, equipment);
@@ -36,7 +37,7 @@ export const useExpeditionsStore = create<ExpeditionState>((set, get) => ({
     const meta = MISSION_META[mission.type]; const runId = crypto.randomUUID();
     const designated = equipment.find((i) => i.slot === meta.slot);
     const seed = crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
-    const run: ExpeditionRun = { id: runId, owner, mission, startedAt: now, finishAt: now + TIERS[mission.tier].hours * 3600000, snapshot: { primary: stats[meta.primary], secondary: stats[meta.secondary], item: designated ? structuredClone(designated) : undefined }, seed, claimed: false };
+    const run: ExpeditionRun = { id: runId, owner, mission, startedAt: now, finishAt: now + TIERS[mission.tier].hours * 3600000, snapshot: { primary: stats[meta.primary], secondary: stats[meta.secondary], item: designated ? structuredClone(designated) : undefined, ...(mission.bossId ? { combat: { ...stats } } : {}) }, seed, claimed: false };
     set((s) => ({ runs: [...s.runs, run] })); return runId;
   },
   speedUp: (id, now = Date.now()) => {
@@ -47,9 +48,14 @@ export const useExpeditionsStore = create<ExpeditionState>((set, get) => ({
   claim: (id, now = Date.now()) => {
     const run = get().runs.find((r) => r.id === id && r.owner === currentOwner());
     if (!run || run.claimed || now < run.finishAt) return null;
-    const reward = rewardFor(run.mission, run.snapshot, seededRng(run.seed));
+    const rng = seededRng(run.seed);
+    const battle = run.snapshot.combat ? fightBoss(run.mission, run.snapshot.combat, rng) : null;
+    if (run.mission.bossId && !battle) return null;
+    const rolled = rewardFor(run.mission, run.snapshot, rng);
+    const [titanium, plasma, rations] = TIERS[run.mission.tier].resources;
+    const reward = battle && !battle.won ? { items: { titanium, plasma, rations }, xp: rolled.xp, draws: 0 } : rolled;
     if (!useItemsStore.getState().creditBatch(reward.items)) return null;
     usePlayerStore.getState().addXp(reward.xp);
-    set((s) => ({ runs: s.runs.map((r) => r.id === id ? { ...r, claimed: true, reward } : r) })); return reward;
+    set((s) => ({ runs: s.runs.map((r) => r.id === id ? { ...r, claimed: true, reward, battle: battle ?? undefined } : r) })); return reward;
   },
 }));

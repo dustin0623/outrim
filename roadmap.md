@@ -5,7 +5,8 @@
 - [x] Five chest rarities, item shards, 100-shard crafting and tactical supplies
 - [x] Expedition dispatch, countdown, speed-up, claim and HUD integration
 - [x] Rule tests and signed-in end-to-end verification
-- [ ] Live boss combat, player reconnaissance and Plasma raids (blocked: live player targets and combat settlement not yet implemented)
+- [ ] Boss expeditions: travel, base/equipment combat, battle report and rewards
+- [ ] Live player reconnaissance and Plasma raids (blocked: multiplayer targets and authoritative combat settlement)
 
 ## Station costs and troops (done: 3 ground + 3 ships, instant, resources only)
 - [x] Production facility resource-specific costs and tests
