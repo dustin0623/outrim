@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Crosshair, Minus, Plus } from "lucide-react";
+import { Crosshair, Landmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Minimap } from "@/components/world/Minimap";
 import { GameBridge } from "@/game/bridge/GameBridge";
 import type { Hex } from "@/lib/game/world/hex";
 const starfield = "/assets/world/starfield.jpg";
@@ -12,7 +13,7 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
   const [bridge] = useState(() => new GameBridge());
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
-  const [zoom, setZoom] = useState(1);
+  const [view, setView] = useState<Hex | null>(null);
   const [progress, setProgress] = useState({ value: 5, stage: "Initializing core simulation" });
   const selectRef = useRef(onSelect);
   selectRef.current = onSelect;
@@ -26,7 +27,7 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
     let destroy: (() => void) | undefined;
     const unsubscribe = bridge.onEvent((event) => {
       if (event.type === "selected") selectRef.current(event.hex);
-      if (event.type === "camera") setZoom(event.zoom);
+      if (event.type === "view") setView((v) => (v && v.q === event.hex.q && v.r === event.hex.r ? v : event.hex));
       if (event.type === "progress") setProgress({ value: event.value, stage: event.stage });
       if (event.type === "ready") { setReady(true); bridge.command({ type: "select", hex: selectedRef.current }); }
     });
@@ -86,12 +87,15 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
           )}
         </div>
       )}
-      <div className="absolute bottom-5 right-5 flex flex-col items-center gap-1 border border-border bg-card p-1">
-        <Button variant="ghost" size="icon" title="Zoom in" aria-label="Zoom in" onClick={() => bridge.command({ type: "zoom", factor: 1.2 })}><Plus /></Button>
-        <span className="w-10 text-center font-mono text-[10px] text-muted-foreground">{Math.round(zoom * 100)}%</span>
-        <Button variant="ghost" size="icon" title="Zoom out" aria-label="Zoom out" onClick={() => bridge.command({ type: "zoom", factor: 1 / 1.2 })}><Minus /></Button>
-        <div className="my-1 w-6 border-t border-border" />
-        <Button variant="ghost" size="icon" title="Center on your station" aria-label="Center on your station" onClick={() => bridge.command({ type: "center" })}><Crosshair /></Button>
+      <div className="absolute bottom-5 right-5 border border-primary/30 bg-card/90 p-1 backdrop-blur">
+        <div className="mb-1 flex items-center justify-between gap-1 px-1">
+          <span className="text-[9px] uppercase text-muted-foreground">World map</span>
+          <span className="flex">
+            <Button variant="ghost" size="icon" className="size-7" title="Go to Federation Station" aria-label="Go to Federation Station" onClick={() => bridge.command({ type: "goto", hex: { q: 125, r: 125 } })}><Landmark className="size-4" /></Button>
+            <Button variant="ghost" size="icon" className="size-7" title="Center on your station" aria-label="Center on your station" onClick={() => bridge.command({ type: "center" })}><Crosshair className="size-4" /></Button>
+          </span>
+        </div>
+        <Minimap view={view} onJump={(hex) => bridge.command({ type: "goto", hex })} />
       </div>
     </div>
   );

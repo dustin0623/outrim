@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 import { GameBridge } from "@/game/bridge/GameBridge";
 import { HOME, WORLD_SIZE, inBounds, type Hex } from "@/lib/game/world/hex";
+import { territoryAt } from "@/lib/game/world/territories";
 import { ISO_Y, SECTOR_SIZE, pixelToSector, sectorToPixel, spaceObjectAt } from "@/lib/game/world/space";
 const stationUrl = "/assets/world/station.png";
 const oceanUrl = "/assets/world/ocean-planet.png";
@@ -14,7 +15,7 @@ export class SpaceWorldScene extends Phaser.Scene {
   private hover: Hex | null = null;
   private down: { x: number; y: number; moved: boolean } | null = null;
   private dirty = true;
-  private palette = { sector: 0, alternate: 0, primary: 0, foreground: 0, rival: 0, muted: 0 };
+  private palette = { sector: 0, alternate: 0, primary: 0, foreground: 0, rival: 0, muted: 0, accent: 0 };
 
   constructor(bridge: GameBridge) { super("SpaceWorld"); this.bridge = bridge; }
 
@@ -38,12 +39,13 @@ export class SpaceWorldScene extends Phaser.Scene {
       const [r = 0, g = 0, b = 0] = probe.getImageData(0, 0, 1, 1).data;
       return (r << 16) | (g << 8) | b;
     };
-    this.palette = { sector: color("--space-sector"), alternate: color("--space-sector-alt"), primary: color("--primary"), foreground: color("--foreground"), rival: color("--base-rival"), muted: color("--muted-foreground") };
+    this.palette = { sector: color("--space-sector"), alternate: color("--space-sector-alt"), primary: color("--primary"), foreground: color("--foreground"), rival: color("--base-rival"), muted: color("--muted-foreground"), accent: color("--accent") };
     this.tiles = this.add.graphics().setDepth(-1);
     this.center();
     const unsubscribe = this.bridge.onCommand((command) => {
       if (command.type === "center") this.center();
       if (command.type === "zoom") this.zoomBy(command.factor);
+      if (command.type === "goto") { const p = sectorToPixel(command.hex); this.cameras.main.centerOn(p.x, p.y); }
       if (command.type === "select") this.selected = command.hex;
       if (command.type === "pan") {
         this.cameras.main.scrollX += command.x / this.cameras.main.zoom;
@@ -124,12 +126,29 @@ export class SpaceWorldScene extends Phaser.Scene {
     const qMax = Math.min(WORLD_SIZE - 1, Math.max(...corners.map((h) => h.q)) + 2);
     const rMin = Math.max(0, Math.min(...corners.map((h) => h.r)) - 2);
     const rMax = Math.min(WORLD_SIZE - 1, Math.max(...corners.map((h) => h.r)) + 2);
+    const mid = camera.getWorldPoint(this.scale.width / 2, this.scale.height / 2);
+    this.bridge.emit({ type: "view", hex: pixelToSector(mid.x, mid.y) });
     const visible = new Set<string>();
     this.tiles.clear();
     for (let r = rMin; r <= rMax; r++) for (let q = qMin; q <= qMax; q++) {
       const h = { q, r }, p = sectorToPixel(h);
       if (p.x < bounds.left - SECTOR_SIZE || p.x > bounds.right + SECTOR_SIZE || p.y < bounds.top - SECTOR_SIZE || p.y > bounds.bottom + SECTOR_SIZE) continue;
       this.hexFill(h, (q + r) % 3 === 0 ? this.palette.alternate : this.palette.sector, (q + r) % 3 === 0 ? 0.19 : 0.09);
+      const territory = territoryAt(h);
+      if (territory) {
+        const fed = territory.kind === "federation";
+        this.hexFill(h, fed ? this.palette.accent : this.palette.rival, h.q === territory.q && h.r === territory.r ? 0.45 : 0.25);
+        if (h.q !== territory.q || h.r !== territory.r) continue;
+        const tkey = `t:${q},${r}`;
+        visible.add(tkey);
+        if (this.objects.has(tkey)) continue;
+        const resolution = Math.ceil((window.devicePixelRatio || 1) * 2);
+        const size = fed ? 330 : 210;
+        const sprite = this.add.image(0, -30, "station").setDisplaySize(size, size);
+        const label = this.add.text(0, fed ? 150 : 100, territory.name.toUpperCase(), { fontFamily: "Arial, sans-serif", fontSize: fed ? "18px" : "14px", fontStyle: "bold", color: Phaser.Display.Color.IntegerToColor(fed ? this.palette.accent : this.palette.foreground).rgba, resolution, stroke: "#000000", strokeThickness: 4 }).setOrigin(0.5);
+        this.objects.set(tkey, this.add.container(p.x, p.y, [sprite, label]).setDepth(p.y));
+        continue;
+      }
       const object = spaceObjectAt(h);
       if (!object) continue;
       const key = `${q},${r}`;

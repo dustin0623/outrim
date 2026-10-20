@@ -70,12 +70,12 @@ export function pixelToHex(x: number, y: number, size: number): Hex {
 export type Site = { q: number; r: number; kind: "own" | "rival"; name: string; targetId?: string };
 
 /** Prototype markers until world joining is persisted. Rival sites link to raid targets. */
-export const HOME: Hex = { q: 125, r: 125 };
+export const HOME: Hex = { q: 125, r: 140 };
 export const PROTOTYPE_SITES: Site[] = [
   { ...HOME, kind: "own", name: "Your Command Rig" },
-  { q: 131, r: 120, kind: "rival", name: "Rust Ward", targetId: "sample-scout" },
-  { q: 118, r: 131, kind: "rival", name: "Cobalt Spire", targetId: "sample-sentry" },
-  { q: 134, r: 128, kind: "rival", name: "Vanta Yard", targetId: "sample-warlord" },
+  { q: 131, r: 135, kind: "rival", name: "Rust Ward", targetId: "sample-scout" },
+  { q: 118, r: 146, kind: "rival", name: "Cobalt Spire", targetId: "sample-sentry" },
+  { q: 134, r: 143, kind: "rival", name: "Vanta Yard", targetId: "sample-warlord" },
 ];
 
 export function siteAt(q: number, r: number) {
