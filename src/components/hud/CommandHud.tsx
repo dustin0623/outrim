@@ -17,10 +17,10 @@ import { HOME, type Hex } from "@/lib/game/world/hex";
 
 const compact = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e4 ? `${(n / 1e3).toFixed(1)}K` : Math.floor(n).toLocaleString());
 
-/** Top-left: avatar/level, guild tag, combat power, RIM and Nanites. */
+/** Top-left: avatar/level, guild tag and combat power. Currencies live in ResourceStack. */
 export function CommanderDossier() {
   const player = useAuthStore((s) => s.player);
-  const balance = useOwnedItems();
+
   const levels = useStationStore((s) => s.levels);
   const items = useEquipmentStore((s) => s.items);
   const equipped = useEquipmentStore((s) => s.equipped);
@@ -39,10 +39,6 @@ export function CommanderDossier() {
           <span className="truncate sm:hidden">{player.displayName}</span>
           <Swords className="size-3.5 text-primary" />
           <b className="font-mono" title="Combat power (attack + defense)">{power.toLocaleString()}</b>
-        </div>
-        <div className="flex gap-1.5">
-          <span title="RIM" className="flex items-center gap-1 bg-background/60 px-1.5 py-0.5"><Coins className="size-3 text-primary" /><b className="font-mono text-[11px]">{compact(balance.rim)}</b></span>
-          <span title="Nanites" className="flex items-center gap-1 bg-background/60 px-1.5 py-0.5"><Sparkles className="size-3 text-accent" /><b className="font-mono text-[11px]">{compact(balance.nanites)}</b></span>
         </div>
       </div>
     </div>
