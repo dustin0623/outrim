@@ -21,7 +21,7 @@ export function generateWorlds(now: number): WorldSite[] {
   const taken = new Set(PROTOTYPE_SITES.map(key));
   const missions = [...dailyBoard(now), ...bossBoard(now)];
   return missions.map((mission, i) => {
-    const radius = (mission.bossId ? 4 : 2) + mission.tier * 2 + Math.floor(hash(day, i + 50) * 2);
+    const radius = (mission.bossId ? 3 : 1) + mission.tier + Math.floor(hash(day, i + 50) * 2);
     let angle = hash(day, i) * Math.PI * 2;
     let hex: Hex = HOME;
     for (let attempt = 0; attempt < 24; attempt++) {
