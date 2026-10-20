@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Box, ChevronDown, ChevronUp, Coins, Crosshair, Flag, Globe2, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, Satellite, ShoppingCart, Sparkles, Store } from "lucide-react";
+import { ChevronDown, ChevronUp, Crosshair, Flag, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, ShoppingCart, Store } from "lucide-react";
 import { toast } from "sonner";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { Button } from "@/components/ui/button";
+import { CommanderDossier, CoordinateBar } from "@/components/hud/CommandHud";
 import { WorldMap } from "@/components/world/WorldMap";
 import { useAuthStore } from "@/features/stores/auth.store";
 import { useStationStore } from "@/features/stores/station.store";
@@ -67,7 +68,6 @@ function Landing() {
 function WorldScreen() {
   const player = useAuthStore((s) => s.player);
   const balance = useOwnedItems();
-  const nanites = balance.nanites;
   const levels = useStationStore((s) => s.levels);
   const exposedOf = useStationStore((s) => s.exposed);
   const secureHaul = useStationStore((s) => s.secureHaul);
@@ -75,6 +75,8 @@ function WorldScreen() {
   const [recenter, setRecenter] = useState(0);
   const [popup, setPopup] = useState<{ hex: Hex; targetId?: string; missionId?: string; name: string } | null>(null);
   const [mailOpen, setMailOpen] = useState(false);
+  const [view, setView] = useState<Hex | null>(HOME);
+  const [jump, setJump] = useState<{ hex: Hex; key: number } | null>(null);
   const [territory, setTerritory] = useState<Territory | null>(null);
   const selectSector = (hex: Hex) => {
     setSelected(hex);
@@ -98,33 +100,20 @@ function WorldScreen() {
   const object = selected ? spaceObjectAt(selected) : null;
   const art = object?.kind === "station" ? station : object?.variant === "ocean" ? ocean : mineral;
 
-  const chips = [
-    { k: "rim", label: "RIM", icon: Coins, value: balance.rim },
-    { k: "nanites", label: "Nanites", icon: Sparkles, value: nanites },
-    ...RESOURCE_KEYS.filter((k) => k !== "rim").map((k) => ({ k, label: RESOURCE_LABEL[k], icon: Box, value: balance[k] })),
-  ];
   const dock = "pointer-events-auto flex min-w-14 flex-col items-center gap-1 border border-primary/20 bg-background/70 px-2 py-2 text-[10px] font-semibold uppercase text-muted-foreground transition hover:border-primary hover:text-primary sm:min-w-20";
 
   return (
     <main className="relative h-dvh w-full overflow-hidden bg-background text-foreground">
-      <WorldMap selected={selected} onSelect={selectSector} recenterKey={recenter} />
+      <WorldMap selected={selected} onSelect={selectSector} recenterKey={recenter} jump={jump} onView={setView} />
 
-      {/* Top command bar */}
-      <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start gap-2 p-2 sm:p-4">
-        <div className="pointer-events-auto flex shrink-0 items-center gap-2 border border-primary/30 bg-card/90 px-2 py-1.5 backdrop-blur">
-          <ProfileDialog />
-        </div>
-        <div className="pointer-events-auto flex min-w-0 flex-1 gap-1.5 overflow-x-auto border border-primary/20 bg-card/80 p-1.5 backdrop-blur [scrollbar-width:none]">
-          {chips.map(({ k, label, icon: Icon, value }) => (
-            <div key={k} title={label} className="flex shrink-0 items-center gap-1.5 bg-background/60 px-2 py-1">
-              <Icon className={`size-3.5 ${k === "nanites" ? "text-accent" : "text-primary"}`} />
-              <span className="hidden text-[9px] uppercase text-muted-foreground lg:inline">{label}</span>
-              <b className="font-mono text-xs">{value.toLocaleString()}</b>
-            </div>
-          ))}
-        </div>
+      {/* Top command bar: dossier left, actions right, coordinates centered below */}
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2 sm:p-4">
+        <CommanderDossier />
         <div className="pointer-events-auto flex shrink-0 items-center border border-primary/20 bg-card/80 p-1 backdrop-blur"><MailButton onClick={() => setMailOpen(true)} /><LeaderboardDialog /><LoginDialog /></div>
       </header>
+      <div className="pointer-events-none absolute inset-x-0 top-[4.6rem] z-10 flex justify-center px-2 sm:top-[5.4rem]">
+        <CoordinateBar view={view} onJump={(hex) => setJump({ hex, key: Date.now() })} />
+      </div>
 
       <div className="pointer-events-none absolute left-4 top-20 hidden sm:block">
         <div className="flex items-center gap-2 text-xs font-semibold"><Hexagon className="size-4 text-primary" /> THE OUTER RIM</div>
