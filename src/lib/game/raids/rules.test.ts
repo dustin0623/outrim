@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { freeVault, raidChance, RAID_FUEL, resolveRaid, ZERO_LOOT } from "./rules";
+import { freeVault, raidChance, RAID_FUEL, raidStats, resolveRaid, ZERO_LOOT } from "./rules";
 import { STARTING_LEVELS } from "@/lib/game/station/buildings";
 import type { Rng } from "@/lib/game/equipment/fleet";
 
