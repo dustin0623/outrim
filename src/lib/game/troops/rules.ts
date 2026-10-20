@@ -15,9 +15,9 @@ export const TroopOrderSchema = z.object({ type: TroopTypeSchema, quantity: z.nu
 export type TroopDef = { name: string; category: TroopCategory; role: string; attack: number; defense: number; cost: Resources; image?: string };
 const c = (titanium: number, plasma: number, rations: number): Resources => ({ rim: 0, titanium, plasma, rations });
 export const TROOP_CATALOG: Record<TroopType, TroopDef> = {
-  soldier: { name: "Soldier", category: "ground", role: "Line infantry", attack: 3, defense: 5, cost: c(30, 0, 40) },
-  archer: { name: "Archer", category: "ground", role: "Ranged support", attack: 6, defense: 2, cost: c(20, 15, 30) },
-  cavalry: { name: "Cavalry", category: "ground", role: "Shock assault", attack: 9, defense: 6, cost: c(60, 20, 60) },
+  soldier: { name: "Void Marine", category: "ground", role: "Armored infantry", attack: 3, defense: 5, cost: c(30, 0, 40) },
+  archer: { name: "Rail Sniper", category: "ground", role: "Long-range marksman", attack: 6, defense: 2, cost: c(20, 15, 30) },
+  cavalry: { name: "Hover Lancer", category: "ground", role: "Fast assault mech", attack: 9, defense: 6, cost: c(60, 20, 60) },
   "vanguard-striker": { name: "Vanguard Striker", category: "ship", role: "Attack craft", attack: 25, defense: 5, cost: c(180, 90, 0), image: "/assets/ships/vanguard-striker.png" },
   "bulwark-frigate": { name: "Bulwark Frigate", category: "ship", role: "Escort shield", attack: 5, defense: 25, cost: c(200, 0, 80), image: "/assets/ships/bulwark-frigate.png" },
   "aegis-dreadnought": { name: "Aegis Dreadnought", category: "ship", role: "Capital warship", attack: 40, defense: 40, cost: c(450, 220, 160) },
