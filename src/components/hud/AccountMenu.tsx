@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 const short = (v: string) => (v.length > 14 ? `${v.slice(0, 6)}…${v.slice(-4)}` : v);
 
 /** Top-left account dropdown (mirrors reference AccountDropdown): copy, profile, referrals, histories, disconnect. */
-export function AccountMenu({ power, guildTag }: { power: number; guildTag?: string }) {
+export function AccountMenu({ power, guildTag }: { power: number; guildTag?: string | undefined }) {
   const player = useAuthStore((s) => s.player);
   const logout = useAuthStore((s) => s.logout);
   const xp = usePlayerStore((s) => s.xp);

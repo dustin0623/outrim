@@ -44,7 +44,7 @@ export function ProfileDialog({ open, onOpenChange }: { open?: boolean; onOpenCh
   ];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog {...(open === undefined ? {} : { open, ...(onOpenChange ? { onOpenChange } : {}) })}>
       {open === undefined && <DialogTrigger asChild>
         <button className="flex items-center gap-2 cursor-pointer text-left" aria-label="Open operator profile">
           <img src={avatarEntry.image} alt="" width={32} height={32} className="size-8 shrink-0 border border-border object-cover" loading="lazy" />
