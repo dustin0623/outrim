@@ -25,8 +25,8 @@ export const utcDay = (now: number) => new Date(now).toISOString().slice(0, 10);
 export function dailyBoard(now: number): Mission[] {
   const day = utcDay(now);
   const offset = Math.floor(now / 86400000) % 4;
-  const rotation: MissionType[] = ["salvage", "stealth", "fortune", "combat"];
-  const missions: Mission[] = [{ id: `${day}:1:defense`, day, tier: 1, type: "defense" }];
+  const rotation: MissionType[] = ["salvage", "stealth", "fortune", "defense"];
+  const missions: Mission[] = [{ id: `${day}:1:combat`, day, tier: 1, type: "combat" }];
   for (const tier of [2, 3, 4, 5] as const) {
     const type = rotation[(offset + tier - 2) % rotation.length] ?? "salvage";
     missions.push({ id: `${day}:${tier}:${type}`, day, tier, type });
