@@ -1450,5 +1450,6 @@ Preserve the architecture unless the user explicitly requests an architectural c
 - Operator profile: leveling formula and cosmetic catalog are pure modules in src/lib/game/profile (reference formulas), UI state in src/features/stores/player.store.ts, cosmetics served from public/assets/{avatars,banners,backgrounds} by literal URLs (why: level math testable, one XP source credited by station/equipment stores).
 
 - Stackable quantities live in the owner-scoped items store; unique gear lives in the equipment store with owner and listing metadata. Station state never holds spendable balances (why: separate future items/equipments tables and one quantity source).
+- Troops (ground units and ships) are one stackable owner+type+quantity domain in src/lib/game/troops and troops.store, separate from items and equipment (why: future `troops` table, basis for guild wars).
 - Marketplace is a session-only simulated market; purchases validate listing state and expected price before transferring RIM and ownership synchronously, with no fee (why: no live settlement or persistence is connected).
 - Rankings use pure src/lib/game/leaderboard rules and session stores; opponents are labeled samples (why: no live player standings yet).

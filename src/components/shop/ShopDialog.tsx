@@ -9,8 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useItemsStore, useOwnedItems } from "@/features/stores/items.store";
 import { ITEM_CATALOG, MAX_PURCHASE_QUANTITY, SHOP_DESCRIPTIONS, SHOP_PRICES_RIM, type ShopItemId } from "@/lib/game/items/catalog";
 import { RARITIES, RARITY_META } from "@/lib/game/equipment/fleet";
-import { ShipCard } from "@/components/shop/ShipCard";
-import { SHIP_TYPES } from "@/lib/game/ships/rules";
+import { TroopCard } from "@/components/shop/TroopCard";
+import { troopsIn } from "@/lib/game/troops/rules";
 import { RESOURCE_KEYS, RESOURCE_LABEL } from "@/lib/game/station/economy";
 
 const STOCK: { id: ShopItemId; icon: typeof Package }[] = [
@@ -61,12 +61,12 @@ export function ShopDialog({ trigger }: { trigger?: ReactNode }) {
           <DialogDescription>{RESOURCE_KEYS.map((k) => `${balance[k].toLocaleString()} ${RESOURCE_LABEL[k]}`).join(" · ")} · Up to {MAX_PURCHASE_QUANTITY} per purchase</DialogDescription>
         </DialogHeader>
         <Tabs defaultValue="supplies" className="min-w-0">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="supplies">Depot Supply</TabsTrigger>
-            <TabsTrigger value="ships">Orbital Shipyard</TabsTrigger>
+            <TabsTrigger value="barracks">Barracks</TabsTrigger><TabsTrigger value="ships">Shipyard</TabsTrigger>
           </TabsList>
           <TabsContent value="supplies"><div className="grid gap-3 sm:grid-cols-3">{STOCK.map((s) => <StockCard key={s.id} {...s} />)}</div></TabsContent>
-          <TabsContent value="ships"><div className="grid gap-3 sm:grid-cols-2">{SHIP_TYPES.map((type) => <ShipCard key={type} type={type} />)}</div></TabsContent>
+          <TabsContent value="barracks"><div className="grid gap-3 sm:grid-cols-3">{troopsIn("ground").map((t) => <TroopCard key={t} type={t} />)}</div></TabsContent><TabsContent value="ships"><div className="grid gap-3 sm:grid-cols-3">{troopsIn("ship").map((t) => <TroopCard key={t} type={t} />)}</div></TabsContent>
         </Tabs>
       </DialogContent>
     </Dialog>
