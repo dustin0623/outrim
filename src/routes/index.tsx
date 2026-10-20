@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Box, Compass, ChevronDown, ChevronUp, Coins, Crosshair, Globe2, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, Satellite, ShoppingCart, Sparkles, Store, Swords } from "lucide-react";
+import { Box, ChevronDown, ChevronUp, Coins, Crosshair, Globe2, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, Satellite, ShoppingCart, Sparkles, Store } from "lucide-react";
 import { toast } from "sonner";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import { LoginDialog } from "@/components/auth/LoginDialog";
@@ -11,8 +11,9 @@ import { useStationStore } from "@/features/stores/station.store";
 import { StationDialog } from "@/components/station/StationDialog";
 import { InventoryDialog } from "@/components/inventory/InventoryDialog";
 import { MarketplaceDialog } from "@/components/marketplace/MarketplaceDialog";
-import { ExpeditionsDialog } from "@/components/expeditions/ExpeditionsDialog";
-import { RaidsDialog } from "@/components/raids/RaidsDialog";
+import { WorldDialog } from "@/components/expeditions/WorldDialog";
+import { StationTargetDialog } from "@/components/raids/StationTargetDialog";
+import { MailButton, MailDialog } from "@/components/mail/MailDialog";
 import { ShopDialog } from "@/components/shop/ShopDialog";
 import { LeaderboardDialog } from "@/components/leaderboard/LeaderboardDialog";
 import { useOwnedItems } from "@/features/stores/items.store";
@@ -70,6 +71,15 @@ function WorldScreen() {
   const secureHaul = useStationStore((s) => s.secureHaul);
   const [selected, setSelected] = useState<Hex | null>(HOME);
   const [recenter, setRecenter] = useState(0);
+  const [popup, setPopup] = useState<{ hex: Hex; targetId?: string; missionId?: string; name: string } | null>(null);
+  const [mailOpen, setMailOpen] = useState(false);
+  const selectSector = (hex: Hex) => {
+    setSelected(hex);
+    const hit = spaceObjectAt(hex);
+    if (hit?.targetId) setPopup({ hex, targetId: hit.targetId, name: hit.name });
+    else if (hit?.missionId) setPopup({ hex, missionId: hit.missionId, name: hit.name });
+  };
+  const openMail = () => { setPopup(null); setMailOpen(true); };
   const [reconOpen, setReconOpen] = useState(true);
   useEffect(() => { if (window.innerWidth < 640) setReconOpen(false); }, []);
   const [now, setNow] = useState(() => Date.now());
@@ -92,7 +102,7 @@ function WorldScreen() {
 
   return (
     <main className="relative h-dvh w-full overflow-hidden bg-background text-foreground">
-      <WorldMap selected={selected} onSelect={setSelected} recenterKey={recenter} />
+      <WorldMap selected={selected} onSelect={selectSector} recenterKey={recenter} />
 
       {/* Top command bar */}
       <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start gap-2 p-2 sm:p-4">
@@ -108,7 +118,7 @@ function WorldScreen() {
             </div>
           ))}
         </div>
-        <div className="pointer-events-auto flex shrink-0 items-center border border-primary/20 bg-card/80 p-1 backdrop-blur"><LeaderboardDialog /><LoginDialog /></div>
+        <div className="pointer-events-auto flex shrink-0 items-center border border-primary/20 bg-card/80 p-1 backdrop-blur"><MailButton onClick={() => setMailOpen(true)} /><LeaderboardDialog /><LoginDialog /></div>
       </header>
 
       <div className="pointer-events-none absolute left-4 top-20 hidden sm:block">
@@ -126,9 +136,9 @@ function WorldScreen() {
           <div className="flex items-center gap-3">
             {object ? <img src={art} alt="" width={56} height={56} className="size-14 shrink-0 object-contain" loading="lazy" /> : <Orbit className="m-2 size-10 shrink-0 text-muted-foreground" />}
             <div className="min-w-0 text-xs">
-              <p className="text-[9px] uppercase text-primary">{object?.kind === "station" ? (object.variant === "own" ? "Home sector" : "Occupied sector") : object ? "Boss world" : "Unoccupied sector"}</p>
+              <p className="text-[9px] uppercase text-primary">{object?.kind === "station" ? (object.variant === "own" ? "Home sector" : "Occupied sector") : object ? "Expedition world" : "Unoccupied sector"}</p>
               <p className="text-muted-foreground">{object?.kind === "station" ? "Orbital station" : object ? (object.variant === "ocean" ? "Ocean planet" : "Mineral planet") : "Open space"} · {selected ? hexDistance(HOME, selected) : 0} sectors away</p>
-              {object?.kind === "planet" && <p className="text-[10px] text-accent">Expedition destinations</p>}
+              {object?.kind === "planet" && <p className="text-[10px] text-accent">{object.subtitle} · click to explore</p>}
             </div>
           </div>
           <div className="border border-border bg-background/60 p-2">
@@ -155,10 +165,12 @@ function WorldScreen() {
           <InventoryDialog trigger={<button className={dock}><Package className="size-5" />Items</button>} />
           <ShopDialog trigger={<button className={dock}><ShoppingCart className="size-5" />Shop</button>} />
           <MarketplaceDialog trigger={<button className={dock}><Store className="size-5" />Market</button>} />
-          <ExpeditionsDialog trigger={<Button variant="ghost" className={`${dock} h-auto rounded-none`}><Compass className="size-5" />Explore</Button>} />
-          <RaidsDialog trigger={<Button variant="ghost" className={`${dock} h-auto rounded-none`}><Swords className="size-5" />Raids</Button>} />
         </div>
       </nav>
+
+      <StationTargetDialog targetId={popup?.targetId ?? null} stationName={popup?.name ?? ""} hex={popup?.hex ?? null} onClose={() => setPopup(null)} onOpenMail={openMail} />
+      <WorldDialog missionId={popup?.missionId ?? null} hex={popup?.hex ?? null} onClose={() => setPopup(null)} onOpenMail={openMail} />
+      <MailDialog open={mailOpen} onOpenChange={setMailOpen} />
     </main>
   );
 }

@@ -3,8 +3,10 @@ import { currentOwner, useItemsStore } from "./items.store";
 import { useEquipmentStore } from "./equipment.store";
 import { useStationStore } from "./station.store";
 import { usePlayerStore } from "./player.store";
+import { useMailStore } from "./mails.store";
+import { ITEM_CATALOG } from "@/lib/game/items/catalog";
 import { levelFromXp } from "@/lib/game/profile/level";
-import { bossBoard, fightBoss, type BattleReport } from "@/lib/game/expeditions/bosses";
+import { bossBoard, bossFor, fightBoss, type BattleReport } from "@/lib/game/expeditions/bosses";
 import { acceleratedFinish, dailyBoard, expeditionStats, MISSION_META, requirementChecks, rewardFor, TIERS, type ExpeditionReward, type ExpeditionSnapshot, type Mission } from "@/lib/game/expeditions/rules";
 export type ExpeditionRun = { id: string; owner: string; mission: Mission; startedAt: number; finishAt: number; snapshot: ExpeditionSnapshot; seed: number; claimed: boolean; reward?: ExpeditionReward | undefined; battle?: BattleReport | undefined };
 type ExpeditionState = {
@@ -56,6 +58,13 @@ export const useExpeditionsStore = create<ExpeditionState>((set, get) => ({
     const reward = battle && !battle.won ? { items: { titanium, plasma, rations }, xp: rolled.xp, draws: 0 } : rolled;
     if (!useItemsStore.getState().creditBatch(reward.items)) return null;
     usePlayerStore.getState().addXp(reward.xp);
-    set((s) => ({ runs: s.runs.map((r) => r.id === id ? { ...r, claimed: true, reward, battle: battle ?? undefined } : r) })); return reward;
+    set((s) => ({ runs: s.runs.map((r) => r.id === id ? { ...r, claimed: true, reward, battle: battle ?? undefined } : r) }));
+    const name = bossFor(run.mission)?.name ?? MISSION_META[run.mission.type].label;
+    useMailStore.getState().send({ ownerId: run.owner, category: "expedition", sender: "Mothership", subject: `${battle ? (battle.won ? "Boss defeated" : "Retreated") : "Expedition complete"}: ${name} · T${run.mission.tier}`, createdAt: now, body: [
+      `+${reward.xp} XP · ${reward.draws} draws`,
+      `Recovered: ${Object.entries(reward.items).map(([k, n]) => `+${n} ${ITEM_CATALOG[k as keyof typeof ITEM_CATALOG].name}`).join(", ")}`,
+      ...(battle ? [`Battle: ${battle.rounds.length} rounds · fleet hull ${battle.rounds.at(-1)?.playerHp ?? battle.playerMaxHp}/${battle.playerMaxHp}`] : []),
+    ] });
+    return reward;
   },
 }));

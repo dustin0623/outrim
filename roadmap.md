@@ -74,3 +74,5 @@
 ## Resource & extraction engine
 - [x] Extractor produces Exposed Alloy over time (60 × level / hr), capped by Storehouse (1,000 × level)
 - [x] Secure Haul moves exposed Alloy into the spendable secured vault; HUD + sector panel show both balances
+- [x] Map-click pop-ups for rival stations and expedition worlds; daily world generation
+- [x] Mail inbox for battle, scout and expedition reports
