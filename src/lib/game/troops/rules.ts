@@ -24,6 +24,11 @@ export const TROOP_CATALOG: Record<TroopType, TroopDef> = {
 };
 export const troopsIn = (category: TroopCategory) => TROOP_TYPES.filter((t) => TROOP_CATALOG[t].category === category);
 
+/** One shared roster limit, not a separate allowance for each unit or category. */
+export const troopCapacity = (level: number) => 50 + Math.min(100, Math.max(1, Math.floor(Number.isFinite(level) ? level : 1))) * 25;
+export const troopCount = (counts: TroopCounts) => TROOP_TYPES.reduce((total, type) => total + counts[type], 0);
+export const canRecruitTroops = (counts: TroopCounts, quantity: number, level: number) => Number.isSafeInteger(quantity) && quantity > 0 && troopCount(counts) + quantity <= troopCapacity(level);
+
 export function calculateTroopBatchCost(type: TroopType, quantity: number): Resources | null {
   const order = TroopOrderSchema.safeParse({ type, quantity });
   if (!order.success) return null;

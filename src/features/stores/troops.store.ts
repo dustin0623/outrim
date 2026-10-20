@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import { useAuthStore } from "./auth.store";
 import { currentOwner, useItemsStore } from "./items.store";
-import { calculateTroopBatchCost, EMPTY_TROOPS, type TroopCounts, type TroopType } from "@/lib/game/troops/rules";
+import { calculateTroopBatchCost, canRecruitTroops, EMPTY_TROOPS, type TroopCounts, type TroopType } from "@/lib/game/troops/rules";
+import { usePlayerStore } from "./player.store";
+import { levelFromXp } from "@/lib/game/profile/level";
 
 type TroopsState = { accounts: Record<string, TroopCounts>; recruit: (type: TroopType, quantity: number) => boolean };
 
@@ -18,6 +20,7 @@ export const useTroopsStore = create<TroopsState>((set, get) => ({
     const cost = calculateTroopBatchCost(type, quantity);
     if (!owner || !cost) return false;
     const counts = get().accounts[owner] ?? EMPTY_TROOPS;
+    if (!canRecruitTroops(counts, quantity, levelFromXp(usePlayerStore.getState().xp))) return false;
     const next = counts[type] + quantity;
     if (!Number.isSafeInteger(next) || !useItemsStore.getState().debitBatch(cost)) return false;
     set((s) => ({ accounts: { ...s.accounts, [owner]: { ...counts, [type]: next } } }));

@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { useOwnedItems } from "@/features/stores/items.store";
 import { useOwnedTroops, useTroopsStore } from "@/features/stores/troops.store";
 import { MAX_PURCHASE_QUANTITY } from "@/lib/game/items/catalog";
-import { calculateTroopBatchCost, TROOP_CATALOG, type TroopType } from "@/lib/game/troops/rules";
+import { calculateTroopBatchCost, canRecruitTroops, troopCount, troopCapacity, TROOP_CATALOG, type TroopType } from "@/lib/game/troops/rules";
+import { usePlayerStore } from "@/features/stores/player.store";
+import { levelFromXp } from "@/lib/game/profile/level";
 import { canAfford } from "@/lib/game/station/buildings";
 import { RESOURCE_KEYS, RESOURCE_LABEL } from "@/lib/game/station/economy";
 
@@ -16,12 +18,16 @@ export function TroopCard({ type }: { type: TroopType }) {
   const unit = TROOP_CATALOG[type];
   const balance = useOwnedItems();
   const counts = useOwnedTroops();
+  const level = levelFromXp(usePlayerStore((s) => s.xp));
+  const capacity = troopCapacity(level);
+  const used = troopCount(counts);
   const recruit = useTroopsStore((s) => s.recruit);
   const [raw, setRaw] = useState("1");
   const quantity = Number(raw);
   const cost = calculateTroopBatchCost(type, quantity);
   const affordable = cost !== null && canAfford(balance, cost);
-  const max = Math.max(0, Math.min(MAX_PURCHASE_QUANTITY, ...RESOURCE_KEYS.filter((k) => unit.cost[k] > 0).map((k) => Math.floor(balance[k] / unit.cost[k]))));
+  const fits = canRecruitTroops(counts, quantity, level);
+  const max = Math.max(0, Math.min(MAX_PURCHASE_QUANTITY, capacity - used, ...RESOURCE_KEYS.filter((k) => unit.cost[k] > 0).map((k) => Math.floor(balance[k] / unit.cost[k]))));
   const Icon = ICON[type] ?? Swords;
   const step = (d: number) => setRaw(String(Math.max(1, Math.min(MAX_PURCHASE_QUANTITY, (Number.isInteger(quantity) ? quantity : 1) + d))));
   const verb = unit.category === "ship" ? "Construct" : "Recruit";
@@ -32,6 +38,7 @@ export function TroopCard({ type }: { type: TroopType }) {
       </div>
       <div><h3 className="font-semibold">{unit.name}</h3><p className="text-xs text-muted-foreground">{unit.role} · Owned × {counts[type].toLocaleString()}</p></div>
       <div className="flex justify-between text-xs"><span className="text-primary">+{unit.attack} ATK · +{unit.defense} DEF</span><span className="text-muted-foreground">Instant</span></div>
+      <p className="text-xs text-muted-foreground">Roster {used} / {capacity} · Lv {level}</p>
       <dl className="space-y-1 border-y border-border py-2 text-xs">
         {RESOURCE_KEYS.filter((k) => unit.cost[k] > 0).map((k) => (
           <div key={k} className="flex justify-between gap-2"><dt className="text-muted-foreground">{RESOURCE_LABEL[k]}</dt><dd className={cost && balance[k] < cost[k] ? "font-mono text-destructive" : "font-mono"}>{cost ? cost[k].toLocaleString() : "—"} <span className="text-muted-foreground">/ {balance[k].toLocaleString()}</span></dd></div>
@@ -43,8 +50,8 @@ export function TroopCard({ type }: { type: TroopType }) {
         <Button size="icon" variant="outline" aria-label={`Increase ${unit.name} quantity`} disabled={quantity >= MAX_PURCHASE_QUANTITY} onClick={() => step(1)}><Plus className="size-3" /></Button>
         <Button variant="ghost" size="sm" disabled={max < 1} onClick={() => setRaw(String(max))}>Max</Button>
       </div>
-      <Button disabled={!affordable} onClick={() => (recruit(type, quantity) ? toast.success(`${quantity} ${unit.name} joined your forces`) : toast.error("Order could not be completed"))}>
-        {!cost ? "Invalid quantity" : affordable ? `${verb} × ${quantity}` : "Not enough resources"}
+      <Button disabled={!affordable || !fits} onClick={() => (recruit(type, quantity) ? toast.success(`${quantity} ${unit.name} joined your forces`) : toast.error("Order could not be completed"))}>
+        {!cost ? "Invalid quantity" : !fits ? "Troop capacity reached" : affordable ? `${verb} × ${quantity}` : "Not enough resources"}
       </Button>
     </article>
   );
