@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ProfileDialog } from "@/components/profile/ProfileDialog";
 import { useAuthStore } from "@/features/stores/auth.store";
 import { useEquipmentStore } from "@/features/stores/equipment.store";
-import { useGuildsStore } from "@/features/stores/guilds.store";
+import { useGuildStore } from "@/features/stores/guilds.store";
 import { useOwnedItems } from "@/features/stores/items.store";
 import { useStationStore } from "@/features/stores/station.store";
 import { useOwnedTroops } from "@/features/stores/troops.store";
@@ -25,7 +25,7 @@ export function CommanderDossier() {
   const items = useEquipmentStore((s) => s.items);
   const equipped = useEquipmentStore((s) => s.equipped);
   const troops = useOwnedTroops();
-  const guild = useGuildsStore((s) => s.guilds.find((g) => player && g.members.includes(player.id)));
+  const guild = useGuildStore((s) => s.guilds.find((g) => player && g.members.includes(player.id)));
   if (!player) return null;
   const gear = SLOTS.map((slot) => items.find((i) => i.id === equipped[slot] && i.ownerId === player.id && !i.marketPrice)).filter((i): i is NonNullable<typeof i> => !!i);
   const stats = raidStats(levels, gear, troops);
