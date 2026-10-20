@@ -6,9 +6,9 @@ import { GameBridge } from "@/game/bridge/GameBridge";
 import type { Hex } from "@/lib/game/world/hex";
 const starfield = "/assets/world/starfield.jpg";
 
-type Props = { selected: Hex | null; onSelect: (h: Hex) => void; recenterKey: number };
+type Props = { selected: Hex | null; onSelect: (h: Hex) => void; recenterKey: number; jump?: { hex: Hex; key: number } | null; onView?: (h: Hex) => void };
 
-export function WorldMap({ selected, onSelect, recenterKey }: Props) {
+export function WorldMap({ selected, onSelect, recenterKey, jump, onView }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
   const [bridge] = useState(() => new GameBridge());
   const [ready, setReady] = useState(false);
@@ -17,6 +17,8 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
   const [progress, setProgress] = useState({ value: 5, stage: "Initializing core simulation" });
   const selectRef = useRef(onSelect);
   selectRef.current = onSelect;
+  const viewRef = useRef(onView);
+  viewRef.current = onView;
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
 
@@ -27,6 +29,7 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
     let destroy: (() => void) | undefined;
     const unsubscribe = bridge.onEvent((event) => {
       if (event.type === "selected") selectRef.current(event.hex);
+      if (event.type === "view") viewRef.current?.(event.hex);
       if (event.type === "view") setView((v) => (v && v.q === event.hex.q && v.r === event.hex.r ? v : event.hex));
       if (event.type === "progress") setProgress({ value: event.value, stage: event.stage });
       if (event.type === "ready") { setReady(true); bridge.command({ type: "select", hex: selectedRef.current }); }
@@ -52,6 +55,7 @@ export function WorldMap({ selected, onSelect, recenterKey }: Props) {
 
   useEffect(() => { bridge.command({ type: "select", hex: selected }); }, [bridge, selected]);
   useEffect(() => { bridge.command({ type: "center" }); }, [bridge, recenterKey]);
+  useEffect(() => { if (jump) bridge.command({ type: "goto", hex: jump.hex }); }, [bridge, jump]);
 
   return (
     <div className="relative h-full w-full overflow-hidden">
