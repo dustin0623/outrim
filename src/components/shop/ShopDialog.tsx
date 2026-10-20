@@ -5,9 +5,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useItemsStore, useOwnedItems } from "@/features/stores/items.store";
 import { ITEM_CATALOG, MAX_PURCHASE_QUANTITY, SHOP_DESCRIPTIONS, SHOP_PRICES_RIM, type ShopItemId } from "@/lib/game/items/catalog";
 import { RARITIES, RARITY_META } from "@/lib/game/equipment/fleet";
+import { ShipCard } from "@/components/shop/ShipCard";
+import { SHIP_TYPES } from "@/lib/game/ships/rules";
+import { RESOURCE_KEYS, RESOURCE_LABEL } from "@/lib/game/station/economy";
 
 const STOCK: { id: ShopItemId; icon: typeof Package }[] = [
   { id: "equipment-crate", icon: Package },
@@ -45,7 +49,7 @@ function StockCard({ id, icon: Icon }: { id: ShopItemId; icon: typeof Package })
 }
 
 export function ShopDialog({ trigger }: { trigger?: ReactNode }) {
-  const { rim } = useOwnedItems();
+  const balance = useOwnedItems();
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -54,9 +58,16 @@ export function ShopDialog({ trigger }: { trigger?: ReactNode }) {
       <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-4xl overflow-y-auto border-primary/30 bg-card/95 backdrop-blur">
         <DialogHeader>
           <DialogTitle>Supply Depot</DialogTitle>
-          <DialogDescription>{rim.toLocaleString()} RIM · Up to {MAX_PURCHASE_QUANTITY} per purchase · Open crates from Inventory</DialogDescription>
+          <DialogDescription>{RESOURCE_KEYS.map((k) => `${balance[k].toLocaleString()} ${RESOURCE_LABEL[k]}`).join(" · ")} · Up to {MAX_PURCHASE_QUANTITY} per purchase</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-3 sm:grid-cols-3">{STOCK.map((s) => <StockCard key={s.id} {...s} />)}</div>
+        <Tabs defaultValue="supplies" className="min-w-0">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="supplies">Depot Supply</TabsTrigger>
+            <TabsTrigger value="ships">Orbital Shipyard</TabsTrigger>
+          </TabsList>
+          <TabsContent value="supplies"><div className="grid gap-3 sm:grid-cols-3">{STOCK.map((s) => <StockCard key={s.id} {...s} />)}</div></TabsContent>
+          <TabsContent value="ships"><div className="grid gap-3 sm:grid-cols-2">{SHIP_TYPES.map((type) => <ShipCard key={type} type={type} />)}</div></TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
