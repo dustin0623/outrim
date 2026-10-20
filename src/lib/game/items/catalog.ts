@@ -34,7 +34,7 @@ export const SHOP_DESCRIPTIONS: Record<ShopItemId, string> = {
   "equipment-crate": "Rolls one random fleet module. Open it from Inventory.",
   "sabotage-device": "Attempt to disrupt a rival's Tribute, Attack or Defense. Consumed on every valid attempt.",
   "help-kit": "Attempt to reduce active disruption on another operator. Never boosts above normal stats.",
-  "recon-drone": "Reconnaissance supply for rival troop intelligence. Player reconnaissance is awaiting the PvP system.",
+  "recon-drone": "Rival intelligence: troop composition, true combat totals and exposed supplies.",
   "warp-drive": "Cuts remaining expedition travel time by 50%; completes trips with 15 minutes or less remaining.",
 };
 export const EMPTY_ITEMS = Object.fromEntries(ITEM_IDS.map((id) => [id, 0])) as Quantities;
