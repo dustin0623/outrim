@@ -1,10 +1,10 @@
 # Roadmap
 
 ## Mock PvP: steps 1 and 2
-- [ ] Shared level-based troop cap and recruitment controls
-- [ ] Stat-based Plasma raids, bounded exposed plunder and owner-scoped sample targets
-- [ ] Recon Drone reports, hidden troops, expiry and raid invalidation
-- [ ] Raid console, battle logs, tests and signed-in browser verification
+- [x] Shared level-based troop cap and recruitment controls
+- [x] Stat-based Plasma raids, bounded exposed plunder and owner-scoped sample targets
+- [x] Recon Drone reports, hidden troops, expiry and raid invalidation
+- [x] Raid console, battle logs, tests and signed-in browser verification
 - Deferred by request: persistence, live token settlement, audio and guild territories
 
 ## Approved expeditions

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Box, Compass, ChevronDown, ChevronUp, Coins, Crosshair, Globe2, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, Satellite, ShoppingCart, Sparkles, Store } from "lucide-react";
+import { Box, Compass, ChevronDown, ChevronUp, Coins, Crosshair, Globe2, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, Satellite, ShoppingCart, Sparkles, Store, Swords } from "lucide-react";
 import { toast } from "sonner";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import { LoginDialog } from "@/components/auth/LoginDialog";
@@ -12,6 +12,7 @@ import { StationDialog } from "@/components/station/StationDialog";
 import { InventoryDialog } from "@/components/inventory/InventoryDialog";
 import { MarketplaceDialog } from "@/components/marketplace/MarketplaceDialog";
 import { ExpeditionsDialog } from "@/components/expeditions/ExpeditionsDialog";
+import { RaidsDialog } from "@/components/raids/RaidsDialog";
 import { ShopDialog } from "@/components/shop/ShopDialog";
 import { LeaderboardDialog } from "@/components/leaderboard/LeaderboardDialog";
 import { useOwnedItems } from "@/features/stores/items.store";
@@ -155,6 +156,7 @@ function WorldScreen() {
           <ShopDialog trigger={<button className={dock}><ShoppingCart className="size-5" />Shop</button>} />
           <MarketplaceDialog trigger={<button className={dock}><Store className="size-5" />Market</button>} />
           <ExpeditionsDialog trigger={<Button variant="ghost" className={`${dock} h-auto rounded-none`}><Compass className="size-5" />Explore</Button>} />
+          <RaidsDialog trigger={<Button variant="ghost" className={`${dock} h-auto rounded-none`}><Swords className="size-5" />Raids</Button>} />
         </div>
       </nav>
     </main>
