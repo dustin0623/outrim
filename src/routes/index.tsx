@@ -12,6 +12,7 @@ import { StationDialog } from "@/components/station/StationDialog";
 import { InventoryDialog } from "@/components/inventory/InventoryDialog";
 import { MarketplaceDialog } from "@/components/marketplace/MarketplaceDialog";
 import { ShopDialog } from "@/components/shop/ShopDialog";
+import { LeaderboardDialog } from "@/components/leaderboard/LeaderboardDialog";
 import { useOwnedItems } from "@/features/stores/items.store";
 import { FleetDialog } from "@/components/fleet/FleetDialog";
 import { ProfileDialog } from "@/components/profile/ProfileDialog";
@@ -105,7 +106,7 @@ function WorldScreen() {
             </div>
           ))}
         </div>
-        <div className="pointer-events-auto shrink-0 border border-primary/20 bg-card/80 p-1 backdrop-blur"><LoginDialog /></div>
+        <div className="pointer-events-auto flex shrink-0 items-center border border-primary/20 bg-card/80 p-1 backdrop-blur"><LeaderboardDialog /><LoginDialog /></div>
       </header>
 
       <div className="pointer-events-none absolute left-4 top-20 hidden sm:block">
