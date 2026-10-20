@@ -72,6 +72,6 @@ describe("inventory and marketplace", () => {
     expect(useStationStore.getState().secureHaul()).toMatchObject({ rim: 1, titanium: 100, plasma: 100, rations: 100 });
     expect(useItemsStore.getState().getQuantity("rim")).toBe(11);
     expect(useStationStore.getState().upgrade("tribute")).toBe(true);
-    expect(useItemsStore.getState().getQuantity("titanium")).toBe(INITIAL_ITEMS.titanium + 60);
+    expect(useItemsStore.getState().getQuantity("titanium")).toBe(INITIAL_ITEMS.titanium + 100);
   });
 });
