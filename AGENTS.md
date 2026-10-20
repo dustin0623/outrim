@@ -1451,3 +1451,4 @@ Preserve the architecture unless the user explicitly requests an architectural c
 
 - Stackable quantities live in the owner-scoped items store; unique gear lives in the equipment store with owner and listing metadata. Station state never holds spendable balances (why: separate future items/equipments tables and one quantity source).
 - Marketplace is a session-only simulated market; purchases validate listing state and expected price before transferring RIM and ownership synchronously, with no fee (why: no live settlement or persistence is connected).
+- Rankings use pure src/lib/game/leaderboard rules and session stores; opponents are labeled samples (why: no live player standings yet).
