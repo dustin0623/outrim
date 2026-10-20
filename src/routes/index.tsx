@@ -119,8 +119,11 @@ function WorldScreen() {
 
       {/* Top command bar: dossier left, actions right, coordinates centered below */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2 sm:p-4">
-        <CommanderDossier />
-        <div className="pointer-events-auto flex shrink-0 items-center border border-primary/20 bg-card/80 p-1 backdrop-blur"><MailButton onClick={() => setMailOpen(true)} /><LoginDialog /></div>
+        <div className="flex items-stretch gap-1.5">
+          <CommanderDossier />
+          {player && <div className="pointer-events-auto flex items-center border border-primary/30 bg-card/90 px-1 backdrop-blur"><MailButton onClick={() => setMailOpen(true)} /></div>}
+        </div>
+        {!player && <div className="pointer-events-auto flex shrink-0 items-center border border-primary/20 bg-card/80 p-1 backdrop-blur"><LoginDialog /></div>}
       </header>
       <div className="pointer-events-none absolute inset-x-0 top-[4.6rem] z-10 flex justify-center px-2 sm:top-[5.4rem]">
         <CoordinateBar view={view} onJump={(hex) => setJump({ hex, key: Date.now() })} />
