@@ -81,4 +81,10 @@
 - [x] Four 7-tile outposts + 19-tile central Federation Station on the map
 - [x] Session guilds (create/join/leave), territory holders and perks
 - [x] World minimap with click-to-jump; recenter and Federation buttons on it
-- [ ] Guild war capture battles (next)
+- [x] Guild war capture battles (next)
+
+## Lords Mobile-style HUD (Phase 1)
+- [x] Commander dossier (avatar, level, guild tag, combat power, RIM/Nanites) top-left
+- [x] Centered coordinates badge with quick-jump dialog; right-side Titanium/Plasma/Rations stack with rates
+- [x] Mail, Rankings and Account clustered top-right; verified signed-in on desktop and mobile
+- [ ] Phase 2: tactical bottom ribbon with notification badges and floating Home compass
