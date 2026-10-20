@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Box, ChevronDown, ChevronUp, Coins, Crosshair, Globe2, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, Satellite, ShoppingCart, Sparkles, Store } from "lucide-react";
+import { Box, ChevronDown, ChevronUp, Coins, Crosshair, Flag, Globe2, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, Satellite, ShoppingCart, Sparkles, Store } from "lucide-react";
 import { toast } from "sonner";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import { LoginDialog } from "@/components/auth/LoginDialog";
@@ -22,6 +22,8 @@ import { ProfileDialog } from "@/components/profile/ProfileDialog";
 import { HOME, hexDistance, type Hex } from "@/lib/game/world/hex";
 import { RESOURCE_KEYS, RESOURCE_LABEL, hasAny, vaultCap } from "@/lib/game/station/economy";
 import { spaceObjectAt } from "@/lib/game/world/space";
+import { territoryAt, type Territory } from "@/lib/game/world/territories";
+import { GuildDialog, TerritoryDialog } from "@/components/guilds/GuildDialog";
 const starfield = "/assets/world/starfield.jpg";
 const station = "/assets/world/station.png";
 const ocean = "/assets/world/ocean-planet.png";
@@ -73,8 +75,11 @@ function WorldScreen() {
   const [recenter, setRecenter] = useState(0);
   const [popup, setPopup] = useState<{ hex: Hex; targetId?: string; missionId?: string; name: string } | null>(null);
   const [mailOpen, setMailOpen] = useState(false);
+  const [territory, setTerritory] = useState<Territory | null>(null);
   const selectSector = (hex: Hex) => {
     setSelected(hex);
+    const t = territoryAt(hex);
+    if (t) { setTerritory(t); return; }
     const hit = spaceObjectAt(hex);
     if (hit?.targetId) setPopup({ hex, targetId: hit.targetId, name: hit.name });
     else if (hit?.missionId) setPopup({ hex, missionId: hit.missionId, name: hit.name });
@@ -165,11 +170,13 @@ function WorldScreen() {
           <InventoryDialog trigger={<button className={dock}><Package className="size-5" />Items</button>} />
           <ShopDialog trigger={<button className={dock}><ShoppingCart className="size-5" />Shop</button>} />
           <MarketplaceDialog trigger={<button className={dock}><Store className="size-5" />Market</button>} />
+          <GuildDialog trigger={<button className={dock}><Flag className="size-5" />Guild</button>} />
         </div>
       </nav>
 
       <StationTargetDialog targetId={popup?.targetId ?? null} stationName={popup?.name ?? ""} hex={popup?.hex ?? null} onClose={() => setPopup(null)} onOpenMail={openMail} />
       <WorldDialog missionId={popup?.missionId ?? null} hex={popup?.hex ?? null} onClose={() => setPopup(null)} onOpenMail={openMail} />
+      <TerritoryDialog territory={territory} onClose={() => setTerritory(null)} />
       <MailDialog open={mailOpen} onOpenChange={setMailOpen} />
     </main>
   );

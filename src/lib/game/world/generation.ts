@@ -1,5 +1,6 @@
 import { HOME, PROTOTYPE_SITES, inBounds, pixelToHex, type Hex } from "./hex";
 import { dailyBoard, MISSION_META, utcDay, type Mission } from "@/lib/game/expeditions/rules";
+import { territoryAt } from "./territories";
 import { bossBoard, bossFor } from "@/lib/game/expeditions/bosses";
 
 export type WorldSite = Hex & { missionId: string; mission: Mission; name: string; variant: "ocean" | "mineral"; boss: boolean };
@@ -27,7 +28,7 @@ export function generateWorlds(now: number): WorldSite[] {
     for (let attempt = 0; attempt < 24; attempt++) {
       const offset = pixelToHex(Math.cos(angle) * radius * Math.sqrt(3), Math.sin(angle) * radius * 1.5, 1);
       hex = { q: HOME.q + offset.q, r: HOME.r + offset.r };
-      if (inBounds(hex) && !taken.has(key(hex))) break;
+      if (inBounds(hex) && !taken.has(key(hex)) && !territoryAt(hex)) break;
       angle += 0.45;
     }
     taken.add(key(hex));
