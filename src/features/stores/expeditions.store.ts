@@ -23,7 +23,7 @@ export const useExpeditionsStore = create<ExpeditionState>((set, get) => ({
   claimStarter: () => {
     const owner = currentOwner(); if (!owner || get().starters.includes(owner)) return false;
     const id = crypto.randomUUID();
-    useEquipmentStore.setState((s) => ({ items: [...s.items, { id, ownerId: owner, slot: "mothership", rarity: "common", level: 1, stats: { luck: 2 } }], equipped: { ...s.equipped, mothership: s.items.some((i) => i.id === s.equipped.mothership && i.ownerId === owner && !i.marketPrice) ? s.equipped.mothership : id } }));
+    useEquipmentStore.setState((s) => ({ items: [...s.items, { id, ownerId: owner, slot: "mothership", rarity: "common", level: 1, stats: { luck: 2 } }], equipped: { ...s.equipped, mothership: s.items.some((i) => i.id === s.equipped.mothership && i.ownerId === owner && !i.marketPrice) ? (s.equipped.mothership ?? id) : id } }));
     set((s) => ({ starters: [...s.starters, owner] })); return true;
   },
   dispatch: (id, now = Date.now()) => {
