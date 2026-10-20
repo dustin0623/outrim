@@ -1451,5 +1451,5 @@ Preserve the architecture unless the user explicitly requests an architectural c
 
 - Stackable quantities live in the owner-scoped items store; unique gear lives in the equipment store with owner and listing metadata. Station state never holds spendable balances (why: separate future items/equipments tables and one quantity source).
 - Troops (ground units and ships) are one stackable owner+type+quantity domain in src/lib/game/troops and troops.store, separate from items and equipment (why: future `troops` table, basis for guild wars).
-- Marketplace is a session-only simulated market; purchases validate listing state and expected price before transferring RIM and ownership synchronously, with no fee (why: no live settlement or persistence is connected).
+- Marketplace is session-only: purchases validate listing state and price, then transfer RIM and ownership synchronously, no fee (why: no live settlement yet).
 - Rankings use pure src/lib/game/leaderboard rules and session stores; opponents are labeled samples (why: no live player standings yet).
