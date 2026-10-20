@@ -1,5 +1,12 @@
 # Roadmap
 
+## Mock PvP: steps 1 and 2
+- [ ] Shared level-based troop cap and recruitment controls
+- [ ] Stat-based Plasma raids, bounded exposed plunder and owner-scoped sample targets
+- [ ] Recon Drone reports, hidden troops, expiry and raid invalidation
+- [ ] Raid console, battle logs, tests and signed-in browser verification
+- Deferred by request: persistence, live token settlement, audio and guild territories
+
 ## Approved expeditions
 - [x] Tiered daily mission rules, Nanite fuel, base/equipment checks and rewards
 - [x] Five chest rarities, item shards, 100-shard crafting and tactical supplies
