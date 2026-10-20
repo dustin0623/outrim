@@ -27,5 +27,10 @@ Screenshot rarity weights (Common→Legendary): T1 47/49/4/0/0; T2 41/44/12/2/1;
 
 Alpha draw formula: stat surplus adds up to 75% to the seeded score; secondary adds up to 10 points. Clamp score to 0–100, map to 0.5–3× base draws, round, then apply independent item bonuses. Per-draw shard baseline falls 10/8/6/4/2 with tier; independent uniform variance is 0.20–1.80×, rounded with minimum one shard. Tactical supply probability is 5% + secondary×0.2%, capped at 25%, split evenly between Recon Drone and Overcharger.
 
+## Boss expeditions
+Five daily boss destinations share mission tier requirements, travel times, Nanite costs and the one-active-flight limit. Each boss can be attempted once per UTC day. Combat uses launch-snapshotted base/equipment Attack, Defense, Crit and Evasion, never troops or consumable boosts. On arrival, a seeded simulation resolves at most 20 rounds and exposes a hull/damage battle report. Victory receives the tier's luck-influenced shard draws; retreat still grants guaranteed strategic resources and XP, but no shard draws. No direct higher-rarity chest drops bypass 100-shard crafting.
+
+Boss identities, hull values, damage mitigation and capped crit/evasion probabilities are Outrim alpha balancing choices, not exact TerraCore formulas. The first boss is accessible with the starter Mothership and base combat stats.
+
 ## Current boundaries
-Everything uses the existing session-only game stores. Reloading loses missions, equipment and balances; this is not persistent or authoritative settlement. Real boss HP fights, multiplayer reconnaissance, military fuel spending and saved progress are separate future work. Seeded rolls prevent ordinary UI rerolls, not client tampering. Authoritative server validation is required before a live economy.
+Everything uses the existing session-only game stores. Reloading loses missions, equipment and balances; this is not persistent or authoritative settlement. Multiplayer reconnaissance, military fuel spending and saved progress are separate future work. Seeded rolls prevent ordinary UI rerolls, not client tampering. Authoritative server validation is required before a live economy.
