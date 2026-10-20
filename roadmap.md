@@ -76,3 +76,9 @@
 - [x] Secure Haul moves exposed Alloy into the spendable secured vault; HUD + sector panel show both balances
 - [x] Map-click pop-ups for rival stations and expedition worlds; daily world generation
 - [x] Mail inbox for battle, scout and expedition reports
+
+## Guilds and territories
+- [x] Four 7-tile outposts + 19-tile central Federation Station on the map
+- [x] Session guilds (create/join/leave), territory holders and perks
+- [x] World minimap with click-to-jump; recenter and Federation buttons on it
+- [ ] Guild war capture battles (next)
