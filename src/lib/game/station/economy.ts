@@ -11,9 +11,9 @@ export const PRODUCER: Record<ResourceKey, "tribute" | "titanium" | "plasma" | "
   rim: "tribute", titanium: "titanium", plasma: "plasma", rations: "rations",
 };
 /** Output per hour per producing-facility level. */
-export const PRODUCTION_RATE: Resources = { rim: 1, titanium: 40, plasma: 20, rations: 25 };
+export const PRODUCTION_RATE: Resources = { rim: 1, titanium: 60, plasma: 30, rations: 45 };
 /** Unsecured capacity per Vault level. */
-export const VAULT_CAP: Resources = { rim: 10, titanium: 1000, plasma: 1000, rations: 1000 };
+export const VAULT_CAP: Resources = { rim: 10, titanium: 1500, plasma: 1500, rations: 1500 };
 
 const map = (f: (k: ResourceKey) => number): Resources =>
   Object.fromEntries(RESOURCE_KEYS.map((k) => [k, f(k)])) as Resources;
