@@ -13,7 +13,7 @@ import { levelFromXp, levelProgress } from "@/lib/game/profile/level";
 import { getCosmeticByKind } from "@/lib/game/profile/templates";
 import { cn } from "@/lib/utils";
 
-export function ProfileDialog() {
+export function ProfileDialog({ open, onOpenChange }: { open?: boolean; onOpenChange?: (o: boolean) => void } = {}) {
   const player = useAuthStore((s) => s.player);
   const { xp, avatar, banner, background, joinedAt, milestones } = usePlayerStore();
   const levels = useStationStore((s) => s.levels);
@@ -44,8 +44,8 @@ export function ProfileDialog() {
   ];
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <Dialog {...(open === undefined ? {} : { open, ...(onOpenChange ? { onOpenChange } : {}) })}>
+      {open === undefined && <DialogTrigger asChild>
         <button className="flex items-center gap-2 cursor-pointer text-left" aria-label="Open operator profile">
           <img src={avatarEntry.image} alt="" width={32} height={32} className="size-8 shrink-0 border border-border object-cover" loading="lazy" />
           <div className="hidden text-right sm:block">
@@ -53,7 +53,7 @@ export function ProfileDialog() {
             <div className="text-[9px] uppercase text-primary">Level {progress.level}</div>
           </div>
         </button>
-      </DialogTrigger>
+      </DialogTrigger>}
       <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto border-border bg-card p-0">
         <div className="relative h-28">
           <img src={bannerEntry.image} alt="" width={768} height={192} className="h-28 w-full object-cover" />

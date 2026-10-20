@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, Crosshair, Flag, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, ShoppingCart, Store } from "lucide-react";
+import { ChevronDown, ChevronUp, Crosshair, Flag, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, ShoppingCart, Store, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import { LoginDialog } from "@/components/auth/LoginDialog";
@@ -120,7 +120,7 @@ function WorldScreen() {
       {/* Top command bar: dossier left, actions right, coordinates centered below */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2 sm:p-4">
         <CommanderDossier />
-        <div className="pointer-events-auto flex shrink-0 items-center border border-primary/20 bg-card/80 p-1 backdrop-blur"><MailButton onClick={() => setMailOpen(true)} /><LeaderboardDialog /><LoginDialog /></div>
+        <div className="pointer-events-auto flex shrink-0 items-center border border-primary/20 bg-card/80 p-1 backdrop-blur"><MailButton onClick={() => setMailOpen(true)} /><LoginDialog /></div>
       </header>
       <div className="pointer-events-none absolute inset-x-0 top-[4.6rem] z-10 flex justify-center px-2 sm:top-[5.4rem]">
         <CoordinateBar view={view} onJump={(hex) => setJump({ hex, key: Date.now() })} />
@@ -174,6 +174,7 @@ function WorldScreen() {
           <ShopDialog trigger={<button className={dock}><ShoppingCart className="size-5" />Shop</button>} />
           <MarketplaceDialog trigger={<button className={dock}><Store className="size-5" />Market</button>} />
           <GuildDialog trigger={<button className={dock}><Flag className="size-5" />Guild</button>} />
+          <LeaderboardDialog trigger={<button className={dock}><Trophy className="size-5" />Ranks</button>} />
         </div>
       </nav>
       <div className="pointer-events-none absolute bottom-24 right-1/2 z-10 translate-x-[11rem] sm:bottom-28 sm:right-auto sm:left-[20rem] sm:translate-x-0">

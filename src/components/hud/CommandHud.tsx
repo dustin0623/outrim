@@ -1,9 +1,9 @@
 import { useState, type ComponentType } from "react";
-import { Box, Coins, Droplets, Home, Landmark, MapPin, Search, Sparkles, Swords, Wheat } from "lucide-react";
+import { Box, Coins, Droplets, Home, Landmark, MapPin, Search, Sparkles, Wheat } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ProfileDialog } from "@/components/profile/ProfileDialog";
+import { AccountMenu } from "@/components/hud/AccountMenu";
 import { useAuthStore } from "@/features/stores/auth.store";
 import { useEquipmentStore } from "@/features/stores/equipment.store";
 import { useGuildStore } from "@/features/stores/guilds.store";
@@ -30,19 +30,7 @@ export function CommanderDossier() {
   const gear = SLOTS.map((slot) => items.find((i) => i.id === equipped[slot] && i.ownerId === player.id && !i.marketPrice)).filter((i): i is NonNullable<typeof i> => !!i);
   const stats = raidStats(levels, gear, troops);
   const power = stats.attack + stats.defense;
-  return (
-    <div className="pointer-events-auto flex items-stretch gap-2 border border-primary/30 bg-card/90 p-1.5 pr-3 backdrop-blur">
-      <ProfileDialog />
-      <div className="flex min-w-0 flex-col justify-center gap-1">
-        <div className="flex items-center gap-1.5 text-xs font-semibold">
-          {guild && <span className="text-accent">[{guild.tag}]</span>}
-          <span className="truncate sm:hidden">{player.displayName}</span>
-          <Swords className="size-3.5 text-primary" />
-          <b className="font-mono" title="Combat power (attack + defense)">{power.toLocaleString()}</b>
-        </div>
-      </div>
-    </div>
-  );
+  return <AccountMenu power={power} guildTag={guild?.tag} />;
 }
 
 /** Top-center: live coordinates with quick-jump dialog. */

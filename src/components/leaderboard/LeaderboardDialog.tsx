@@ -1,3 +1,4 @@
+import type React from "react";
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, RefreshCw, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { rankOperators, rankingPage } from "@/lib/game/leaderboard/rankings";
 
 const number = (value: number) => value.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-export function LeaderboardDialog() {
+export function LeaderboardDialog({ trigger }: { trigger?: React.ReactNode } = {}) {
   const player = useAuthStore((s) => s.player);
   const xp = usePlayerStore((s) => s.xp);
   const avatar = usePlayerStore((s) => s.avatar);
@@ -28,7 +29,7 @@ export function LeaderboardDialog() {
   const data = rankingPage(snapshot.rows, page, player.id);
   return (
     <Dialog onOpenChange={(open) => { if (open) { setPage(1); setRefresh((n) => n + 1); } }}>
-      <DialogTrigger asChild><Button variant="ghost" size="icon" title="Operator Rankings" aria-label="Operator Rankings"><Trophy /></Button></DialogTrigger>
+      <DialogTrigger asChild>{trigger ?? <Button variant="ghost" size="icon" title="Operator Rankings" aria-label="Operator Rankings"><Trophy /></Button>}</DialogTrigger>
       <DialogContent className="max-h-[90dvh] w-[calc(100%-1rem)] max-w-4xl gap-0 overflow-hidden border-primary/30 bg-card/95 p-0 backdrop-blur">
         <div className="relative overflow-hidden border-b border-border px-4 pb-4 pt-6 sm:px-6">
           <img src="/assets/banners/the-leaderboard-tower.webp" alt="" className="absolute inset-0 h-full w-full object-cover opacity-15" />
