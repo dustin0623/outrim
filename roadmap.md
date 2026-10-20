@@ -1,5 +1,11 @@
 # Roadmap
 
+## Approved expeditions
+- [ ] Tiered daily mission rules, Nanite fuel, base/equipment checks and rewards
+- [ ] Five chest rarities, item shards, 100-shard crafting and tactical supplies
+- [ ] Expedition dispatch, countdown, speed-up, claim and HUD integration
+- [ ] Rule tests and signed-in end-to-end verification
+
 ## Station costs and troops (done: 3 ground + 3 ships, instant, resources only)
 - [ ] Production facility resource-specific costs and tests
 - [x] Separate owner-scoped ship counts, resource-only orders and stat rules
