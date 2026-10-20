@@ -5,9 +5,8 @@ import { useStationStore } from "./station.store";
 import { usePlayerStore } from "./player.store";
 import { useMailStore } from "./mails.store";
 import { ITEM_CATALOG } from "@/lib/game/items/catalog";
-import { bossFor } from "@/lib/game/expeditions/bosses";
 import { levelFromXp } from "@/lib/game/profile/level";
-import { bossBoard, fightBoss, type BattleReport } from "@/lib/game/expeditions/bosses";
+import { bossBoard, bossFor, fightBoss, type BattleReport } from "@/lib/game/expeditions/bosses";
 import { acceleratedFinish, dailyBoard, expeditionStats, MISSION_META, requirementChecks, rewardFor, TIERS, type ExpeditionReward, type ExpeditionSnapshot, type Mission } from "@/lib/game/expeditions/rules";
 export type ExpeditionRun = { id: string; owner: string; mission: Mission; startedAt: number; finishAt: number; snapshot: ExpeditionSnapshot; seed: number; claimed: boolean; reward?: ExpeditionReward | undefined; battle?: BattleReport | undefined };
 type ExpeditionState = {

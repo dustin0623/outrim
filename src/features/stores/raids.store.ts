@@ -3,13 +3,11 @@ import { currentOwner, ownedItems, useItemsStore } from "./items.store";
 import { useStationStore } from "./station.store";
 import { useEquipmentStore } from "./equipment.store";
 import { useTroopsStore } from "./troops.store";
-import { EMPTY_TROOPS } from "@/lib/game/troops/rules";
+import { EMPTY_TROOPS, TROOP_CATALOG, TROOP_TYPES } from "@/lib/game/troops/rules";
 import { resourceBalance, applyItemBatch } from "@/lib/game/items/catalog";
-import { subResources, vaultCap } from "@/lib/game/station/economy";
+import { RESOURCE_KEYS, RESOURCE_LABEL, subResources, vaultCap } from "@/lib/game/station/economy";
 import { freeVault, INTEL_DURATION, RAID_FUEL, raidStats, resolveRaid, type CombatStats, type RaidOutcome } from "@/lib/game/raids/rules";
 import { sampleRaidTargets, type RaidTarget } from "@/lib/game/raids/targets";
-import { TROOP_CATALOG, TROOP_TYPES } from "@/lib/game/troops/rules";
-import { RESOURCE_KEYS, RESOURCE_LABEL } from "@/lib/game/station/economy";
 import { useMailStore } from "./mails.store";
 
 export type IntelReport = { target: RaidTarget; stats: CombatStats; capturedAt: number; expiresAt: number };

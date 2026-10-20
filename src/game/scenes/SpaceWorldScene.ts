@@ -142,7 +142,7 @@ export class SpaceWorldScene extends Phaser.Scene {
       // Rasterize glyphs well above screen density so text stays crisp at max zoom (1.8) on HiDPI.
       const resolution = Math.ceil((window.devicePixelRatio || 1) * 2);
       const label = this.add.text(0, isStation ? 66 : 60, object.name, { fontFamily: "Arial, sans-serif", fontSize: "13px", fontStyle: "bold", color, align: "center", resolution, stroke: "#000000", strokeThickness: 3 }).setOrigin(0.5);
-      const subtitle = this.add.text(0, isStation ? 84 : 77, isStation ? (object.variant === "own" ? "HOME SECTOR" : "RIVAL STATION") : "BOSS WORLD", { fontFamily: "Arial, sans-serif", fontSize: "10px", color: Phaser.Display.Color.IntegerToColor(this.palette.muted).rgba, resolution, stroke: "#000000", strokeThickness: 2 }).setOrigin(0.5);
+      const subtitle = this.add.text(0, isStation ? 84 : 77, object.subtitle, { fontFamily: "Arial, sans-serif", fontSize: "10px", color: Phaser.Display.Color.IntegerToColor(this.palette.muted).rgba, resolution, stroke: "#000000", strokeThickness: 2 }).setOrigin(0.5);
       label.setLetterSpacing(0.5); subtitle.setLetterSpacing(1);
       const container = this.add.container(p.x, p.y, [sprite, label, subtitle]).setDepth(p.y);
       this.objects.set(key, container);
