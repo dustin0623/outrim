@@ -11,8 +11,8 @@ import {
   effectiveStats, salvageValue, upgradeCostNanites, type Equipment, type Rarity, type SlotKey,
 } from "@/lib/game/equipment/fleet";
 import { cn } from "@/lib/utils";
-import { useOwnedShips } from "@/features/stores/fleet-ships.store";
-import { combinedFleetTotals, SHIP_CATALOG, SHIP_TYPES } from "@/lib/game/ships/rules";
+import { useOwnedTroops } from "@/features/stores/troops.store";
+import { combinedFleetTotals, TROOP_CATALOG, troopsIn } from "@/lib/game/troops/rules";
 
 const ICONS: Record<SlotKey, typeof Ship> = { mothership: Ship, commander: Crown, attackers: Swords, shield: Shield, mining: Pickaxe, ecm: Radio };
 const RARITY_CLASS: Record<Rarity, string> = {
@@ -40,7 +40,7 @@ function StatList({ item }: { item: Equipment }) {
 export function FleetDialog({ trigger }: { trigger?: ReactNode }) {
   const { items: allItems, equipped, openCrate, buyCrates, equip, unequip, salvage, upgrade } = useEquipmentStore();
   const owner = useAuthStore((s) => s.player?.id);
-  const ships = useOwnedShips();
+  const ships = useOwnedTroops();
   const items = allItems.filter((i) => i.ownerId === owner && !i.marketPrice);
   const { rim, nanites, "equipment-crate": crates } = useOwnedItems();
   const equippedItems = SLOTS.map((s) => items.find((i) => i.id === equipped[s])).filter(Boolean) as Equipment[];
@@ -62,18 +62,17 @@ export function FleetDialog({ trigger }: { trigger?: ReactNode }) {
           {STATS.map((k) => <div key={k}><div className="text-[9px] uppercase text-muted-foreground">{STAT_LABEL[k]}</div><b className="text-primary">{totals[k]}</b></div>)}
         </div>
 
-        <section className="border-t border-border pt-3">
-          <h3 className="mb-2 text-sm font-semibold uppercase">Armada · {(ships["vanguard-striker"] + ships["bulwark-frigate"]).toLocaleString()} hulls</h3>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {SHIP_TYPES.map((type) => {
-              const ship = SHIP_CATALOG[type];
-              return <div key={type} className="flex items-center gap-3 border border-border bg-background/40 p-3">
-                <img src={ship.image} alt="" loading="lazy" width={64} height={64} className="size-16 shrink-0 object-contain" />
-                <div className="min-w-0 flex-1"><h4 className="text-xs font-semibold">{ship.name}</h4><p className="text-[10px] text-muted-foreground">{ships[type].toLocaleString()} hulls · +{ship.bonus} {ship.stat} each</p><p className="font-mono text-xs text-primary">+{(ships[type] * ship.bonus).toLocaleString()} {ship.stat}</p></div>
-              </div>;
-            })}
-          </div>
-        </section>
+        {(["ground", "ship"] as const).map((cat) => (
+          <section key={cat} className="border-t border-border pt-3">
+            <h3 className="mb-2 text-sm font-semibold uppercase">{cat === "ground" ? "Ground forces" : "Armada"} · {troopsIn(cat).reduce((n, t) => n + ships[t], 0).toLocaleString()} units</h3>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {troopsIn(cat).map((type) => {
+                const u = TROOP_CATALOG[type];
+                return <div key={type} className="border border-border bg-background/40 p-3"><h4 className="text-xs font-semibold">{u.name} × {ships[type].toLocaleString()}</h4><p className="font-mono text-xs text-primary">+{(ships[type] * u.attack).toLocaleString()} ATK · +{(ships[type] * u.defense).toLocaleString()} DEF</p></div>;
+              })}
+            </div>
+          </section>
+        ))}
 
         <div className="grid gap-2 sm:grid-cols-3">
           {SLOTS.map((slot) => {

@@ -7,8 +7,8 @@ import { useEquipmentStore } from "@/features/stores/equipment.store";
 import { usePlayerStore } from "@/features/stores/player.store";
 import { useStationStore } from "@/features/stores/station.store";
 import { SLOTS, SLOT_META, STATS, STAT_LABEL, effectiveStats } from "@/lib/game/equipment/fleet";
-import { useOwnedShips } from "@/features/stores/fleet-ships.store";
-import { combinedFleetTotals } from "@/lib/game/ships/rules";
+import { useOwnedTroops } from "@/features/stores/troops.store";
+import { combinedFleetTotals } from "@/lib/game/troops/rules";
 import { levelFromXp, levelProgress } from "@/lib/game/profile/level";
 import { getCosmeticByKind } from "@/lib/game/profile/templates";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ export function ProfileDialog() {
   const bannerEntry = getCosmeticByKind("banner", banner) ?? getCosmeticByKind("banner", 100)!;
   const backgroundEntry = getCosmeticByKind("background", background) ?? getCosmeticByKind("background", 200)!;
   const equippedItems = SLOTS.map((slot) => items.find((i) => i.id === equipped[slot] && i.ownerId === player.id && !i.marketPrice)).filter(Boolean) as NonNullable<ReturnType<typeof items.find>>[];
-  const ships = useOwnedShips();
+  const ships = useOwnedTroops();
   const fleet = combinedFleetTotals(equippedItems, ships);
   const memberSince = new Date(joinedAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 

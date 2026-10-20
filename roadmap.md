@@ -1,6 +1,6 @@
 # Roadmap
 
-## Station costs and fleet ships
+## Station costs and troops (done: 3 ground + 3 ships, instant, resources only)
 - [ ] Production facility resource-specific costs and tests
 - [x] Separate owner-scoped ship counts, resource-only orders and stat rules
 - [x] Orbital Shipyard and Fleet Command integration
