@@ -1453,3 +1453,6 @@ Preserve the architecture unless the user explicitly requests an architectural c
 - Troops (ground units and ships) are one stackable owner+type+quantity domain in src/lib/game/troops and troops.store, separate from items and equipment (why: future `troops` table, basis for guild wars).
 - Marketplace is session-only: purchases validate listing state and price, then transfer RIM and ownership synchronously, no fee (why: no live settlement yet).
 - Rankings use pure src/lib/game/leaderboard rules and session stores; opponents are labeled samples (why: no live player standings yet).
+
+- Expeditions use pure rules in src/lib/game/expeditions and owner-scoped session runs in expeditions.store; launch snapshots contain base plus equipped stats only, and seeded rewards are credited once on claim (why: isolate troop/buff totals and prevent reward rerolls).
+- Chest recipes and rarity-conditioned rolls live in src/lib/game/items/chests; shards and crates share item quantities, with atomic crafting through items.store (why: no separate shard persistence domain).
