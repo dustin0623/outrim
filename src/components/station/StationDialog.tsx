@@ -43,7 +43,7 @@ export function StationDialog({ trigger }: { trigger?: ReactNode }) {
                   <div className="flex justify-between gap-2"><dt className="text-muted-foreground">Next</dt><dd className="text-right text-accent">{effectAt(b.id, level + 1)}</dd></div>
                 </dl>
                 <ul className="mb-2 grid grid-cols-2 gap-x-3 text-[10px]">
-                  {RESOURCE_KEYS.map((k) => (
+                   {RESOURCE_KEYS.filter((k) => cost[k] > 0).map((k) => (
                     <li key={k} className={`flex justify-between ${balance[k] < cost[k] ? "text-destructive" : "text-muted-foreground"}`}><span>{RESOURCE_LABEL[k]}</span><span className="font-mono">{cost[k].toLocaleString()}</span></li>
                   ))}
                 </ul>
