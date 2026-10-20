@@ -2,8 +2,8 @@
 
 ## Station costs and fleet ships
 - [ ] Production facility resource-specific costs and tests
-- [ ] Separate owner-scoped ship counts, resource-only orders and stat rules
-- [ ] Orbital Shipyard and Fleet Command integration
+- [x] Separate owner-scoped ship counts, resource-only orders and stat rules
+- [x] Orbital Shipyard and Fleet Command integration
 - [ ] Verify purchases and fleet bonuses on desktop and mobile
 
 ## Operator rankings
