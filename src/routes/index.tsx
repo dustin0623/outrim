@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { Button } from "@/components/ui/button";
-import { CommanderDossier, CoordinateBar } from "@/components/hud/CommandHud";
+import { CommanderDossier, CoordinateBar, ResourceStack } from "@/components/hud/CommandHud";
 import { WorldMap } from "@/components/world/WorldMap";
 import { useAuthStore } from "@/features/stores/auth.store";
 import { useStationStore } from "@/features/stores/station.store";
@@ -110,6 +110,9 @@ function WorldScreen() {
       </header>
       <div className="pointer-events-none absolute inset-x-0 top-[4.6rem] z-10 flex justify-center px-2 sm:top-[5.4rem]">
         <CoordinateBar view={view} onJump={(hex) => setJump({ hex, key: Date.now() })} />
+      </div>
+      <div className="pointer-events-none absolute right-2 top-[4.6rem] z-10 flex justify-end sm:right-4 sm:top-[5.4rem]">
+        <ResourceStack />
       </div>
 
       <div className="pointer-events-none absolute left-4 top-20 hidden sm:block">
