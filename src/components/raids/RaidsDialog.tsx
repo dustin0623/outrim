@@ -67,7 +67,6 @@ export function RaidsDialog({ trigger }: { trigger?: ReactNode }) {
               <div className="relative flex h-28 items-center justify-center overflow-hidden bg-background/60">
                 <img src={target.avatar} alt={target.name} className="h-24 w-24 rounded object-cover" />
                 <span className="absolute left-3 top-3 font-mono text-xs text-primary">Lv {target.level}</span>
-                {target.sabotageActive && <span className="absolute right-3 top-3 text-[10px] uppercase text-accent">Sabotaged</span>}
               </div>
               <div className="flex flex-1 flex-col gap-3 p-4">
                 <div><h2 className="text-sm font-semibold">{target.name}</h2>

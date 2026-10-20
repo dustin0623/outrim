@@ -4,8 +4,9 @@ import { STARTING_LEVELS } from "@/lib/game/station/buildings";
 import type { Rng } from "@/lib/game/equipment/fleet";
 
 const stub = (values: number[]): Rng => {
+  const seq = [...values];
   let i = 0;
-  return () => values[i++ % values.length];
+  return () => seq[i++ % seq.length] ?? 0;
 };
 
 describe("raid odds", () => {
