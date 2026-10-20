@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import { Box, Coins, Droplets, Home, Landmark, MapPin, Search, Sparkles, Swords, Wheat } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -81,28 +81,40 @@ export function CoordinateBar({ view, onJump }: { view: Hex | null; onJump: (hex
   );
 }
 
-/** Top-right: vertical Titanium / Plasma / Rations stack with fill and hourly rate. */
+type ResourceRow = {
+  k: "rim" | "nanites" | "titanium" | "plasma" | "rations";
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  tint: string;
+  rate?: number;
+  cap?: number;
+};
+
+/** Right edge: vertical RIM / Nanites / Titanium / Plasma / Rations stack with hourly rate. */
 export function ResourceStack() {
   const balance = useOwnedItems();
   const levels = useStationStore((s) => s.levels);
   const cap = vaultCap(levels);
   const rate = hourlyRate(levels);
-  const rows = [
-    { k: "titanium" as const, label: "Titanium", icon: Box },
-    { k: "plasma" as const, label: "Plasma", icon: Droplets },
-    { k: "rations" as const, label: "Rations", icon: Wheat },
+  const rows: ResourceRow[] = [
+    { k: "rim", label: "RIM", icon: Coins, tint: "text-primary", rate: rate.rim, cap: cap.rim },
+    { k: "nanites", label: "Nanites", icon: Sparkles, tint: "text-accent" },
+    { k: "titanium", label: "Titanium", icon: Box, tint: "text-primary", rate: rate.titanium, cap: cap.titanium },
+    { k: "plasma", label: "Plasma", icon: Droplets, tint: "text-primary", rate: rate.plasma, cap: cap.plasma },
+    { k: "rations", label: "Rations", icon: Wheat, tint: "text-primary", rate: rate.rations, cap: cap.rations },
   ];
   return (
     <div className="pointer-events-auto flex w-28 flex-col gap-1 border border-primary/30 bg-card/90 p-1.5 backdrop-blur sm:w-32">
-      {rows.map(({ k, label, icon: Icon }) => (
-        <div key={k} title={`${label}: ${balance[k].toLocaleString()} · +${rate[k]}/h · vault ${cap[k].toLocaleString()}`} className="bg-background/60 px-1.5 py-1">
+      {rows.map(({ k, label, icon: Icon, tint, rate: perHour, cap: limit }) => (
+        <div key={k} title={limit ? `${label}: ${balance[k].toLocaleString()} · +${perHour}/h · vault ${limit.toLocaleString()}` : `${label}: ${balance[k].toLocaleString()}`} className="bg-background/60 px-1.5 py-1">
           <div className="flex items-center gap-1.5">
-            <Icon className="size-3.5 shrink-0 text-primary" />
+            <Icon className={`size-3.5 shrink-0 ${tint}`} />
             <b className="font-mono text-xs">{compact(balance[k])}</b>
-            <span className="ml-auto font-mono text-[9px] text-muted-foreground">+{compact(rate[k])}/h</span>
+            {perHour !== undefined && <span className="ml-auto font-mono text-[9px] text-muted-foreground">+{compact(perHour)}/h</span>}
           </div>
         </div>
       ))}
     </div>
   );
+
 }
