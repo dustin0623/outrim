@@ -1,0 +1,112 @@
+import { useState } from "react";
+import { Box, Coins, Droplets, Home, Landmark, MapPin, Search, Sparkles, Swords, Wheat } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ProfileDialog } from "@/components/profile/ProfileDialog";
+import { useAuthStore } from "@/features/stores/auth.store";
+import { useEquipmentStore } from "@/features/stores/equipment.store";
+import { useGuildsStore } from "@/features/stores/guilds.store";
+import { useOwnedItems } from "@/features/stores/items.store";
+import { useStationStore } from "@/features/stores/station.store";
+import { useOwnedTroops } from "@/features/stores/troops.store";
+import { SLOTS } from "@/lib/game/equipment/fleet";
+import { raidStats } from "@/lib/game/raids/rules";
+import { hourlyRate, vaultCap } from "@/lib/game/station/economy";
+import { HOME, type Hex } from "@/lib/game/world/hex";
+
+const compact = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e4 ? `${(n / 1e3).toFixed(1)}K` : Math.floor(n).toLocaleString());
+
+/** Top-left: avatar/level, guild tag, combat power, RIM and Nanites. */
+export function CommanderDossier() {
+  const player = useAuthStore((s) => s.player);
+  const balance = useOwnedItems();
+  const levels = useStationStore((s) => s.levels);
+  const items = useEquipmentStore((s) => s.items);
+  const equipped = useEquipmentStore((s) => s.equipped);
+  const troops = useOwnedTroops();
+  const guild = useGuildsStore((s) => s.guilds.find((g) => player && g.members.includes(player.id)));
+  if (!player) return null;
+  const gear = SLOTS.map((slot) => items.find((i) => i.id === equipped[slot] && i.ownerId === player.id && !i.marketPrice)).filter((i): i is NonNullable<typeof i> => !!i);
+  const stats = raidStats(levels, gear, troops);
+  const power = stats.attack + stats.defense;
+  return (
+    <div className="pointer-events-auto flex items-stretch gap-2 border border-primary/30 bg-card/90 p-1.5 pr-3 backdrop-blur">
+      <ProfileDialog />
+      <div className="flex min-w-0 flex-col justify-center gap-1">
+        <div className="flex items-center gap-1.5 text-xs font-semibold">
+          {guild && <span className="text-accent">[{guild.tag}]</span>}
+          <span className="truncate sm:hidden">{player.displayName}</span>
+          <Swords className="size-3.5 text-primary" />
+          <b className="font-mono" title="Combat power (attack + defense)">{power.toLocaleString()}</b>
+        </div>
+        <div className="flex gap-1.5">
+          <span title="RIM" className="flex items-center gap-1 bg-background/60 px-1.5 py-0.5"><Coins className="size-3 text-primary" /><b className="font-mono text-[11px]">{compact(balance.rim)}</b></span>
+          <span title="Nanites" className="flex items-center gap-1 bg-background/60 px-1.5 py-0.5"><Sparkles className="size-3 text-accent" /><b className="font-mono text-[11px]">{compact(balance.nanites)}</b></span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Top-center: live coordinates with quick-jump dialog. */
+export function CoordinateBar({ view, onJump }: { view: Hex | null; onJump: (hex: Hex) => void }) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const [r, setR] = useState("");
+  const jump = (hex: Hex) => { onJump(hex); setOpen(false); };
+  const qn = Number(q), rn = Number(r);
+  const valid = q !== "" && r !== "" && Number.isInteger(qn) && Number.isInteger(rn) && qn >= 0 && qn < 250 && rn >= 0 && rn < 250;
+  return (
+    <>
+      <button onClick={() => { setQ(String(view?.q ?? HOME.q)); setR(String(view?.r ?? HOME.r)); setOpen(true); }}
+        className="pointer-events-auto flex items-center gap-2 border border-primary/30 bg-card/90 px-3 py-1.5 font-mono text-xs backdrop-blur transition hover:border-primary" aria-label="Jump to coordinates">
+        <Search className="size-3.5 text-primary" />
+        <span>Q <b>{view?.q ?? "—"}</b></span><span>R <b>{view?.r ?? "—"}</b></span>
+        <MapPin className="size-3.5 text-muted-foreground" />
+      </button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-xs border-border bg-card">
+          <DialogHeader><DialogTitle>Sector navigation</DialogTitle><DialogDescription>Enter coordinates from 0 to 249.</DialogDescription></DialogHeader>
+          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); if (valid) jump({ q: qn, r: rn }); }}>
+            <div className="flex gap-2">
+              <Input aria-label="Q coordinate" inputMode="numeric" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Q" />
+              <Input aria-label="R coordinate" inputMode="numeric" value={r} onChange={(e) => setR(e.target.value)} placeholder="R" />
+            </div>
+            <Button type="submit" className="w-full" disabled={!valid}>Jump</Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => jump(HOME)}><Home className="size-4" /> Home</Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => jump({ q: 125, r: 125 })}><Landmark className="size-4" /> Federation</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+/** Top-right: vertical Titanium / Plasma / Rations stack with fill and hourly rate. */
+export function ResourceStack() {
+  const balance = useOwnedItems();
+  const levels = useStationStore((s) => s.levels);
+  const cap = vaultCap(levels);
+  const rate = hourlyRate(levels);
+  const rows = [
+    { k: "titanium" as const, label: "Titanium", icon: Box },
+    { k: "plasma" as const, label: "Plasma", icon: Droplets },
+    { k: "rations" as const, label: "Rations", icon: Wheat },
+  ];
+  return (
+    <div className="pointer-events-auto flex w-28 flex-col gap-1 border border-primary/30 bg-card/90 p-1.5 backdrop-blur sm:w-32">
+      {rows.map(({ k, label, icon: Icon }) => (
+        <div key={k} title={`${label}: ${balance[k].toLocaleString()} · +${rate[k]}/h · vault ${cap[k].toLocaleString()}`} className="bg-background/60 px-1.5 py-1">
+          <div className="flex items-center gap-1.5">
+            <Icon className="size-3.5 shrink-0 text-primary" />
+            <b className="font-mono text-xs">{compact(balance[k])}</b>
+            <span className="ml-auto font-mono text-[9px] text-muted-foreground">+{compact(rate[k])}/h</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
