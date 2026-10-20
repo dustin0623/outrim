@@ -17,7 +17,7 @@ describe("troop recruitment", () => {
   });
   it("does not partially debit when short", () => {
     const before = useItemsStore.getState().accounts;
-    expect(useTroopsStore.getState().recruit("aegis-dreadnought", 1)).toBe(false);
+    expect(useTroopsStore.getState().recruit("aegis-dreadnought", 2)).toBe(false);
     expect(useItemsStore.getState().accounts).toEqual(before);
     expect(useTroopsStore.getState().accounts).toEqual({});
   });
