@@ -87,4 +87,4 @@
 - [x] Commander dossier (avatar, level, guild tag, combat power, RIM/Nanites) top-left
 - [x] Centered coordinates badge with quick-jump dialog; right-side Titanium/Plasma/Rations stack with rates
 - [x] Mail, Rankings and Account clustered top-right; verified signed-in on desktop and mobile
-- [ ] Phase 2: tactical bottom ribbon with notification badges and floating Home compass
+- [x] Phase 2: tactical bottom ribbon with notification badges and floating Home compass

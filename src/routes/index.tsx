@@ -23,6 +23,15 @@ import { RESOURCE_KEYS, RESOURCE_LABEL, hasAny, vaultCap } from "@/lib/game/stat
 import { spaceObjectAt } from "@/lib/game/world/space";
 import { territoryAt, type Territory } from "@/lib/game/world/territories";
 import { GuildDialog, TerritoryDialog } from "@/components/guilds/GuildDialog";
+import { HomeCompass } from "@/components/hud/HomeCompass";
+import { useOwnedItems } from "@/features/stores/items.store";
+import { useExpeditionsStore } from "@/features/stores/expeditions.store";
+import { CRATE_IDS } from "@/lib/game/items/chests";
+
+function Badge({ n }: { n: number | string }) {
+  if (!n) return null;
+  return <span className="absolute -right-1 -top-1.5 min-w-4 rounded-full bg-destructive px-1 text-center font-mono text-[9px] leading-4 text-destructive-foreground">{typeof n === "number" && n > 99 ? "99+" : n}</span>;
+}
 const starfield = "/assets/world/starfield.jpg";
 const station = "/assets/world/station.png";
 const ocean = "/assets/world/ocean-planet.png";
@@ -68,6 +77,8 @@ function WorldScreen() {
   const levels = useStationStore((s) => s.levels);
   const exposedOf = useStationStore((s) => s.exposed);
   const secureHaul = useStationStore((s) => s.secureHaul);
+  const items = useOwnedItems();
+  const runs = useExpeditionsStore((s) => s.runs);
   const [selected, setSelected] = useState<Hex | null>(HOME);
   const [recenter, setRecenter] = useState(0);
   const [popup, setPopup] = useState<{ hex: Hex; targetId?: string; missionId?: string; name: string } | null>(null);
@@ -97,7 +108,10 @@ function WorldScreen() {
   const object = selected ? spaceObjectAt(selected) : null;
   const art = object?.kind === "station" ? station : object?.variant === "ocean" ? ocean : mineral;
 
-  const dock = "pointer-events-auto flex min-w-14 flex-col items-center gap-1 border border-primary/20 bg-background/70 px-2 py-2 text-[10px] font-semibold uppercase text-muted-foreground transition hover:border-primary hover:text-primary sm:min-w-20";
+  const dock = "pointer-events-auto relative flex min-w-14 flex-col items-center gap-1 border border-primary/20 bg-background/70 px-2 py-2 text-[10px] font-semibold uppercase text-muted-foreground transition hover:border-primary hover:text-primary sm:min-w-20";
+  const storageFull = RESOURCE_KEYS.some((k) => cap[k] > 0 && exposed[k] >= cap[k]);
+  const crates = CRATE_IDS.reduce((n, id) => n + (items[id] ?? 0), 0);
+  const readyRuns = runs.filter((r) => r.owner === player.id && !r.claimed && r.finishAt <= now).length;
 
   return (
     <main className="relative h-dvh w-full overflow-hidden bg-background text-foreground">
@@ -151,17 +165,20 @@ function WorldScreen() {
         </div>}
       </aside>
 
-      {/* Bottom command dock */}
+      {/* Tactical bottom ribbon */}
       <nav aria-label="Command dock" className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-2 sm:p-4">
-        <div className="pointer-events-auto flex max-w-full gap-1 overflow-x-auto border border-primary/30 bg-card/90 p-1.5 backdrop-blur sm:gap-2">
-          <StationDialog trigger={<button className={dock}><Radar className="size-5" />Station</button>} />
-          <FleetDialog trigger={<button className={dock}><Rocket className="size-5" />Fleet</button>} />
-          <InventoryDialog trigger={<button className={dock}><Package className="size-5" />Items</button>} />
+        <div className="pointer-events-auto flex max-w-full gap-1 overflow-x-auto border-t-2 border-primary/60 bg-card/90 px-1.5 pb-1.5 pt-2 backdrop-blur sm:gap-2">
+          <StationDialog trigger={<button className={dock}><Badge n={storageFull ? "!" : 0} /><Radar className="size-5" />Station</button>} />
+          <FleetDialog trigger={<button className={dock}><Badge n={readyRuns} /><Rocket className="size-5" />Fleet</button>} />
+          <InventoryDialog trigger={<button className={dock}><Badge n={crates} /><Package className="size-5" />Items</button>} />
           <ShopDialog trigger={<button className={dock}><ShoppingCart className="size-5" />Shop</button>} />
           <MarketplaceDialog trigger={<button className={dock}><Store className="size-5" />Market</button>} />
           <GuildDialog trigger={<button className={dock}><Flag className="size-5" />Guild</button>} />
         </div>
       </nav>
+      <div className="pointer-events-none absolute bottom-24 right-1/2 z-10 translate-x-[11rem] sm:bottom-28 sm:right-auto sm:left-[20rem] sm:translate-x-0">
+        <HomeCompass view={view} onHome={() => setRecenter((n) => n + 1)} />
+      </div>
 
       <StationTargetDialog targetId={popup?.targetId ?? null} stationName={popup?.name ?? ""} hex={popup?.hex ?? null} onClose={() => setPopup(null)} onOpenMail={openMail} />
       <WorldDialog missionId={popup?.missionId ?? null} hex={popup?.hex ?? null} onClose={() => setPopup(null)} onOpenMail={openMail} />
