@@ -57,7 +57,7 @@ export function StationTargetDialog({ targetId, stationName, hex, onClose, onOpe
           <Button variant="outline" disabled={!!intel || drones < 1} onClick={() => store.scout(target.id) ? toast.success("Scout report sent to your mail", { action: { label: "Open", onClick: onOpenMail } }) : toast.error("You need a Recon Drone from the Shop")}>
             <ScanEye className="size-4" />Scout · {drones}
           </Button>
-          <Button disabled={balance.plasma < RAID_FUEL} onClick={() => { const log = store.raid(target.id); if (!log) return toast.error(`Raid needs ${RAID_FUEL} Plasma`); toast[log.success ? "success" : "error"](log.success ? "Raid won · report in your mail" : "Raid failed · report in your mail", { action: { label: "Open", onClick: onOpenMail } }); }}>
+          <Button disabled={balance.plasma < RAID_FUEL} onClick={() => { const log = store.raid(target.id); if (!log) { toast.error(`Raid needs ${RAID_FUEL} Plasma`); return; } toast[log.success ? "success" : "error"](log.success ? "Raid won · report in your mail" : "Raid failed · report in your mail", { action: { label: "Open", onClick: onOpenMail } }); }}>
             <Swords className="size-4" />Raid · {RAID_FUEL} Plasma
           </Button>
         </div>
