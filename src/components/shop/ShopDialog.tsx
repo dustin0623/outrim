@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { Bomb, Package, ShieldPlus, ShoppingCart } from "lucide-react";
+import { Bomb, Package, ShieldPlus, ShoppingCart, Radar, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,8 @@ const STOCK: { id: ShopItemId; icon: typeof Package }[] = [
   { id: "equipment-crate", icon: Package },
   { id: "sabotage-device", icon: Bomb },
   { id: "help-kit", icon: ShieldPlus },
+  { id: "recon-drone", icon: Radar },
+  { id: "warp-drive", icon: Zap },
 ];
 
 function StockCard({ id, icon: Icon }: { id: ShopItemId; icon: typeof Package }) {

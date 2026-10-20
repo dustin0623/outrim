@@ -1,7 +1,14 @@
 # Roadmap
 
+## Approved expeditions
+- [x] Tiered daily mission rules, Nanite fuel, base/equipment checks and rewards
+- [x] Five chest rarities, item shards, 100-shard crafting and tactical supplies
+- [x] Expedition dispatch, countdown, speed-up, claim and HUD integration
+- [x] Rule tests and signed-in end-to-end verification
+- [ ] Live boss combat, player reconnaissance and Plasma raids (blocked: live player targets and combat settlement not yet implemented)
+
 ## Station costs and troops (done: 3 ground + 3 ships, instant, resources only)
-- [ ] Production facility resource-specific costs and tests
+- [x] Production facility resource-specific costs and tests
 - [x] Separate owner-scoped ship counts, resource-only orders and stat rules
 - [x] Orbital Shipyard and Fleet Command integration
 - [ ] Verify purchases and fleet bonuses on desktop and mobile

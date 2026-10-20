@@ -1420,20 +1420,12 @@ If the requested feature does not clearly fit an existing layer, inspect the arc
 Preserve the architecture unless the user explicitly requests an architectural change.
 <!-- LOVABLE:END -->
 
-# Auth decisions
-- Each chain module splits into wallet/ (browser-only: extension/WalletConnect signing, player transfers) and server/ (verification, treasury payouts, RPC reads), each with events/{event}/action.ts and an index.ts barrel; shared client.ts/types.ts stay at the chain root. providers/{chain}/sign.ts imports from wallet/, verify.ts from server/ (why: secrets and server crypto never mix with browser wallet code).
-- Auth lives in src/lib/chains/providers/{email}; wallet login = HMAC-signed challenge → wallet signature via module signer → server verify via module verifier (why: stateless, no private keys ever requested).
-- Hive login uses hivexph-sdk (Keychain client for signing, shared rpc client for account keys) plus @noble/secp256k1 for key recovery; @hiveio/dhive is a devDependency used only to generate reference signatures in tests (why: one SDK for all Hive traffic).
-- Solana login: Phantom/Solflare/Backpack via injected providers, MetaMask via @metamask/connect-solana (standard:connect + solana:signMessage); all yield ed25519 detached sigs so one verifier covers all (why: no per-wallet server code).
-- Enabled chain set via config.auth.chain (single value) — at most one chain provider.
+# Project decisions
+- Subdirectories have their own AGENTS.md; read src/lib/chains/AGENTS.md before changing chain modules or authentication.
+
 - Persistence: one folder per collection in src/lib/modules/{collection}/ (server.model/types/repository.ts); mock store in src/features/stores/mock/database.ts, only repositories touch it (why: swap to MongoDB without touching callers).
 - DB connection lives in src/lib/config/database.ts: MONGODB_URI set → lazy shared MongoClient ("mongodb" mode); unset → "mock" mode and the module is never touched (why: single place decides the storage backend).
 
-# Chain module decisions
-- Chain-specific settings (endpoints, application id, signing env var NAMES) live in src/lib/chains/modules/config.ts; src/lib/config/config.ts is app config only. The SDK's own defaults (RPC/beacon URLs) and token symbols/precisions are NOT duplicated there — pass tokens directly in each action file and only add config entries to override the SDK.
-- Hive operations use hivexph-sdk via one shared client in src/lib/chains/modules/hive/client.ts (why: single RPC engine, lazy server-side key resolution).
-- Chain events return HiveActionResult instead of throwing (why: the worker must record ERROR outcomes, never lose failures).
-- Chain event actions accept an optional `client` for injection (why: testable without real blockchain infrastructure).
 
 
 # Transaction Polling Rule
@@ -1453,3 +1445,6 @@ Preserve the architecture unless the user explicitly requests an architectural c
 - Troops (ground units and ships) are one stackable owner+type+quantity domain in src/lib/game/troops and troops.store, separate from items and equipment (why: future `troops` table, basis for guild wars).
 - Marketplace is session-only: purchases validate listing state and price, then transfer RIM and ownership synchronously, no fee (why: no live settlement yet).
 - Rankings use pure src/lib/game/leaderboard rules and session stores; opponents are labeled samples (why: no live player standings yet).
+
+- Expeditions use pure rules in src/lib/game/expeditions and owner-scoped session runs in expeditions.store; launch snapshots contain base plus equipped stats only, and seeded rewards are credited once on claim (why: isolate troop/buff totals and prevent reward rerolls).
+- Chest recipes and rarity-conditioned rolls live in src/lib/game/items/chests; shards and crates share item quantities, with atomic crafting through items.store (why: no separate shard persistence domain).

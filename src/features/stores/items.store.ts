@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { useAuthStore } from "./auth.store";
 import { applyItemBatch, EMPTY_ITEMS, INITIAL_ITEMS, MAX_PURCHASE_QUANTITY, SHOP_PRICES_RIM, type ItemId, type Quantities, type ShopItemId } from "@/lib/game/items/catalog";
+import { CRATE_RARITY, SHARDS_PER_CRATE, shardId, type CrateId } from "@/lib/game/items/chests";
 export const currentOwner = () => useAuthStore.getState().player?.id ?? null;
 type ItemsState = {
   accounts: Record<string, Quantities>;
@@ -12,6 +13,7 @@ type ItemsState = {
   buyContainers: (quantity: number, unitPrice: number) => boolean;
   /** Pay RIM at the catalog price and receive stock in one all-or-nothing change. */
   buyStock: (id: ShopItemId, quantity: number) => boolean;
+  craftCrate: (id: CrateId) => boolean;
   transferRim: (buyer: string, seller: string, amount: number) => boolean;
 };
 export function ownedItems(accounts: Record<string, Quantities>, owner: string | null): Quantities {
@@ -48,6 +50,15 @@ export const useItemsStore = create<ItemsState>((set, get) => {
     debitBatch: (batch) => change(batch, -1),
     buyContainers: (quantity, unitPrice) => buy("equipment-crate", quantity, unitPrice),
     buyStock: (id, quantity) => buy(id, quantity, SHOP_PRICES_RIM[id]),
+    craftCrate: (id) => {
+      const owner = currentOwner();
+      if (!owner || !Object.hasOwn(CRATE_RARITY, id)) return false;
+      const paid = applyItemBatch(ownedItems(get().accounts, owner), { [shardId(CRATE_RARITY[id])]: SHARDS_PER_CRATE }, -1);
+      const next = paid && applyItemBatch(paid, { [id]: 1 }, 1);
+      if (!next) return false;
+      set((s) => ({ accounts: { ...s.accounts, [owner]: next } }));
+      return true;
+    },
     transferRim: (buyer, seller, amount) => {
       if (buyer === seller || amount <= 0) return false;
       const b = applyItemBatch(ownedItems(get().accounts, buyer), { rim: amount }, -1);

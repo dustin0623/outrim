@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Box, ChevronDown, ChevronUp, Coins, Crosshair, Globe2, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, Satellite, ShoppingCart, Sparkles, Store } from "lucide-react";
+import { Box, Compass, ChevronDown, ChevronUp, Coins, Crosshair, Globe2, Hexagon, Orbit, Package, PackageCheck, Radar, Rocket, Satellite, ShoppingCart, Sparkles, Store } from "lucide-react";
 import { toast } from "sonner";
 import { LoginPanel } from "@/components/auth/LoginPanel";
 import { LoginDialog } from "@/components/auth/LoginDialog";
@@ -11,6 +11,7 @@ import { useStationStore } from "@/features/stores/station.store";
 import { StationDialog } from "@/components/station/StationDialog";
 import { InventoryDialog } from "@/components/inventory/InventoryDialog";
 import { MarketplaceDialog } from "@/components/marketplace/MarketplaceDialog";
+import { ExpeditionsDialog } from "@/components/expeditions/ExpeditionsDialog";
 import { ShopDialog } from "@/components/shop/ShopDialog";
 import { LeaderboardDialog } from "@/components/leaderboard/LeaderboardDialog";
 import { useOwnedItems } from "@/features/stores/items.store";
@@ -126,7 +127,7 @@ function WorldScreen() {
             <div className="min-w-0 text-xs">
               <p className="text-[9px] uppercase text-primary">{object?.kind === "station" ? (object.variant === "own" ? "Home sector" : "Occupied sector") : object ? "Boss world" : "Unoccupied sector"}</p>
               <p className="text-muted-foreground">{object?.kind === "station" ? "Orbital station" : object ? (object.variant === "ocean" ? "Ocean planet" : "Mineral planet") : "Open space"} · {selected ? hexDistance(HOME, selected) : 0} sectors away</p>
-              {object?.kind === "planet" && <p className="text-[10px] text-accent">Expeditions not yet available</p>}
+              {object?.kind === "planet" && <p className="text-[10px] text-accent">Expedition destinations</p>}
             </div>
           </div>
           <div className="border border-border bg-background/60 p-2">
@@ -147,12 +148,13 @@ function WorldScreen() {
 
       {/* Bottom command dock */}
       <nav aria-label="Command dock" className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-2 sm:p-4">
-        <div className="pointer-events-auto flex gap-1 border border-primary/30 bg-card/90 p-1.5 backdrop-blur sm:gap-2">
+        <div className="pointer-events-auto flex max-w-full gap-1 overflow-x-auto border border-primary/30 bg-card/90 p-1.5 backdrop-blur sm:gap-2">
           <StationDialog trigger={<button className={dock}><Radar className="size-5" />Station</button>} />
           <FleetDialog trigger={<button className={dock}><Rocket className="size-5" />Fleet</button>} />
           <InventoryDialog trigger={<button className={dock}><Package className="size-5" />Items</button>} />
           <ShopDialog trigger={<button className={dock}><ShoppingCart className="size-5" />Shop</button>} />
           <MarketplaceDialog trigger={<button className={dock}><Store className="size-5" />Market</button>} />
+          <ExpeditionsDialog trigger={<Button variant="ghost" className={`${dock} h-auto rounded-none`}><Compass className="size-5" />Explore</Button>} />
         </div>
       </nav>
     </main>

@@ -55,7 +55,7 @@ export function FleetDialog({ trigger }: { trigger?: ReactNode }) {
       <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-4xl overflow-y-auto border-primary/30 bg-card/95 backdrop-blur">
         <DialogHeader>
           <DialogTitle className="uppercase">Fleet command</DialogTitle>
-          <DialogDescription>{rim.toLocaleString()} RIM · {nanites.toLocaleString()} Nanites (only used to upgrade equipment)</DialogDescription>
+          <DialogDescription>{rim.toLocaleString()} RIM · {nanites.toLocaleString()} Nanites · equipment forging & expedition fuel</DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-3 gap-2 border border-border bg-background/60 p-3 text-xs sm:grid-cols-6">

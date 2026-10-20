@@ -3,6 +3,7 @@ import { CRATE_COST_RIM, MAX_ITEM_LEVEL, rollItem, salvageValue, upgradeCostNani
 import { currentOwner, useItemsStore } from "@/features/stores/items.store";
 import { usePlayerStore } from "@/features/stores/player.store";
 import { XP_PER_NANITE } from "@/lib/game/profile/level";
+import { rollCrateRarity, type CrateId } from "@/lib/game/items/chests";
 
 export type OwnedEquipment = Equipment & { ownerId: string; sellerName?: string | undefined; marketPrice?: number | undefined; listedAt?: number | undefined };
 
@@ -13,7 +14,7 @@ type EquipmentState = {
   list: (id: string, price: number, sellerName: string) => boolean;
   cancel: (id: string) => boolean;
   purchase: (id: string, expectedPrice: number) => boolean;
-  openCrate: () => OwnedEquipment | null;
+  openCrate: (crate?: CrateId) => OwnedEquipment | null;
   equip: (id: string) => void;
   unequip: (slot: SlotKey) => void;
   salvage: (id: string) => number;
@@ -50,10 +51,10 @@ export const useEquipmentStore = create<EquipmentState>((set, get) => ({
     set((s) => ({ items: s.items.map((i) => i.id === id ? { ...i, ownerId: buyer, marketPrice: undefined, listedAt: undefined, sellerName: undefined } : i) }));
     return true;
   },
-  openCrate: () => {
+  openCrate: (crate = "equipment-crate") => {
     const ownerId = currentOwner();
-    if (!ownerId || !useItemsStore.getState().debit("equipment-crate", 1)) return null;
-    const item: OwnedEquipment = { ...rollItem(Math.random, newId()), ownerId };
+    if (!ownerId || !useItemsStore.getState().debit(crate, 1)) return null;
+    const item: OwnedEquipment = { ...rollItem(Math.random, newId(), undefined, rollCrateRarity(crate, Math.random)), ownerId };
     set((s) => ({ items: [...s.items, item] }));
     usePlayerStore.getState().recordCrate();
     return item;
