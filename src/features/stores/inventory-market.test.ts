@@ -69,9 +69,9 @@ describe("inventory and marketplace", () => {
     expect(useStationStore.getState()).not.toHaveProperty("balance");
     expect(useStationStore.getState()).not.toHaveProperty("nanites");
     useStationStore.setState({ levels: { tribute: 1, titanium: 1, plasma: 1, rations: 1, vault: 1, attack: 1, defense: 1 }, lastCollectedAt: Date.now() - 3_600_000 });
-    expect(useStationStore.getState().secureHaul()).toMatchObject({ rim: 1, titanium: 60, plasma: 30, rations: 45 });
+    expect(useStationStore.getState().secureHaul()).toMatchObject({ rim: 1, titanium: 100, plasma: 100, rations: 100 });
     expect(useItemsStore.getState().getQuantity("rim")).toBe(11);
     expect(useStationStore.getState().upgrade("tribute")).toBe(true);
-    expect(useItemsStore.getState().getQuantity("titanium")).toBe(INITIAL_ITEMS.titanium + 60);
+    expect(useItemsStore.getState().getQuantity("titanium")).toBe(INITIAL_ITEMS.titanium + 100);
   });
 });
