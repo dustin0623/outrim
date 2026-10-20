@@ -1448,3 +1448,4 @@ Preserve the architecture unless the user explicitly requests an architectural c
 
 - Expeditions use pure rules in src/lib/game/expeditions and owner-scoped session runs in expeditions.store; launch snapshots contain base plus equipped stats only, and seeded rewards are credited once on claim (why: isolate troop/buff totals and prevent reward rerolls).
 - Chest recipes and rarity-conditioned rolls live in src/lib/game/items/chests; shards and crates share item quantities, with atomic crafting through items.store (why: no separate shard persistence domain).
+- Boss combat is bounded pure logic in src/lib/game/expeditions/bosses; expedition runs snapshot combat stats and settle battle/rewards together (why: one ownership, travel and claim path).
