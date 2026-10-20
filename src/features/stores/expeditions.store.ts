@@ -23,7 +23,7 @@ export const useExpeditionsStore = create<ExpeditionState>((set, get) => ({
   claimStarter: () => {
     const owner = currentOwner(); if (!owner || get().starters.includes(owner)) return false;
     const id = crypto.randomUUID();
-    useEquipmentStore.setState((s) => ({ items: [...s.items, { id, ownerId: owner, slot: "mothership", rarity: "common", level: 1, stats: { luck: 2 } }], equipped: { ...s.equipped, mothership: s.equipped.mothership ?? id } }));
+    useEquipmentStore.setState((s) => ({ items: [...s.items, { id, ownerId: owner, slot: "mothership", rarity: "common", level: 1, stats: { luck: 2 } }], equipped: { ...s.equipped, mothership: s.items.some((i) => i.id === s.equipped.mothership && i.ownerId === owner && !i.marketPrice) ? s.equipped.mothership : id } }));
     set((s) => ({ starters: [...s.starters, owner] })); return true;
   },
   dispatch: (id, now = Date.now()) => {
@@ -34,8 +34,9 @@ export const useExpeditionsStore = create<ExpeditionState>((set, get) => ({
     if (!requirementChecks(mission, levelFromXp(usePlayerStore.getState().xp), stats, equipment).every((c) => c.ok)) return null;
     if (!useItemsStore.getState().debit("nanites", TIERS[mission.tier].fuel)) return null;
     const meta = MISSION_META[mission.type]; const runId = crypto.randomUUID();
+    const designated = equipment.find((i) => i.slot === meta.slot);
     const seed = crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
-    const run: ExpeditionRun = { id: runId, owner, mission, startedAt: now, finishAt: now + TIERS[mission.tier].hours * 3600000, snapshot: { primary: stats[meta.primary], secondary: stats[meta.secondary], item: equipment.find((i) => i.slot === meta.slot) ? structuredClone(equipment.find((i) => i.slot === meta.slot)) : undefined }, seed, claimed: false };
+    const run: ExpeditionRun = { id: runId, owner, mission, startedAt: now, finishAt: now + TIERS[mission.tier].hours * 3600000, snapshot: { primary: stats[meta.primary], secondary: stats[meta.secondary], item: designated ? structuredClone(designated) : undefined }, seed, claimed: false };
     set((s) => ({ runs: [...s.runs, run] })); return runId;
   },
   speedUp: (id, now = Date.now()) => {

@@ -31,4 +31,8 @@ describe("expedition lifecycle", () => {
   it("prevents another owner claiming or accelerating a run", () => {
     useExpeditionsStore.getState().claimStarter(); const id = useExpeditionsStore.getState().dispatch(dailyBoard(now)[0]?.id ?? "", now); if (!id) throw new Error("Launch failed"); useAuthStore.setState({ player: { id: "other" } } as never); expect(useExpeditionsStore.getState().claim(id, now + 3600000)).toBeNull(); expect(useExpeditionsStore.getState().speedUp(id, now)).toBe(false);
   });
+  it("equips the new owner's starter instead of retaining someone else's ship", () => {
+    useExpeditionsStore.getState().claimStarter(); useAuthStore.setState({ player: { id: "second-explorer" } } as never); useExpeditionsStore.getState().claimStarter();
+    const state = useEquipmentStore.getState(); expect(state.items.find((i) => i.id === state.equipped.mothership)?.ownerId).toBe("second-explorer");
+  });
 });
