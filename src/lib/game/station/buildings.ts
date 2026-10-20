@@ -6,10 +6,10 @@ export type BuildingLevels = Record<BuildingId, number>;
 
 /** Per-level resource weight for each facility; RIM always costs max(1, level²). */
 export const BUILDINGS: { id: BuildingId; name: string; summary: string; weights: Omit<Resources, "rim"> }[] = [
-  { id: "tribute", name: "Tribute Office", summary: "Collects RIM sector tax from colonies under your protection", weights: { titanium: 40, plasma: 20, rations: 20 } },
-  { id: "titanium", name: "Titanium Extractor", summary: "Siphons Titanium from nearby asteroids", weights: { titanium: 20, plasma: 30, rations: 20 } },
-  { id: "plasma", name: "Plasma Condenser", summary: "Harvests Plasma fuel for warp travel", weights: { titanium: 40, plasma: 10, rations: 20 } },
-  { id: "rations", name: "Ration Synthesizer", summary: "Grows Rations to feed crews and future troops", weights: { titanium: 30, plasma: 20, rations: 10 } },
+  { id: "tribute", name: "Tribute Office", summary: "Collects RIM sector tax from colonies under your protection", weights: { titanium: 0, plasma: 0, rations: 0 } },
+  { id: "titanium", name: "Titanium Extractor", summary: "Siphons Titanium from nearby asteroids", weights: { titanium: 20, plasma: 0, rations: 0 } },
+  { id: "plasma", name: "Plasma Condenser", summary: "Harvests Plasma fuel for warp travel", weights: { titanium: 0, plasma: 10, rations: 0 } },
+  { id: "rations", name: "Ration Synthesizer", summary: "Grows Rations to feed crews and future troops", weights: { titanium: 0, plasma: 0, rations: 10 } },
   { id: "vault", name: "Vault", summary: "Raises how much uncollected output the station can hold", weights: { titanium: 50, plasma: 10, rations: 10 } },
   { id: "attack", name: "Attack Array", summary: "Raises raid and boss damage", weights: { titanium: 20, plasma: 40, rations: 20 } },
   { id: "defense", name: "Defense Grid", summary: "Protects your station from raids", weights: { titanium: 40, plasma: 10, rations: 30 } },
@@ -20,7 +20,9 @@ export const STARTING_BALANCE: Resources = { rim: 10, titanium: 500, plasma: 250
 
 /** Cost to go from `currentLevel` to the next level. */
 export function upgradeCost(id: BuildingId, currentLevel: number): Resources {
-  const w = BUILDINGS.find((b) => b.id === id)!.weights;
+  const building = BUILDINGS.find((b) => b.id === id);
+  if (!building) throw new Error(`Unknown building: ${id}`);
+  const w = building.weights;
   const sq = Math.max(1, currentLevel * currentLevel);
   return { rim: sq, titanium: w.titanium * sq, plasma: w.plasma * sq, rations: w.rations * sq };
 }
